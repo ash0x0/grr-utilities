@@ -1,0 +1,27 @@
+# Docker file that builds an Ubuntu Xenial image ready for GRR installation.
+#
+# To build a new image on your local machine, cd to this file's directory
+# and run (note the period at the end):
+#   docker build -t grrdocker/xenial-dev -f Dockerfile.xenial .
+# To run the built image use:
+# 	docker run \
+#   	--name grrdocker/xenial-dev \
+#   	--network host \
+#		-p 0.0.0.0:8000:8000 -p 0.0.0.0:8080:8080 \
+#   	-e EXTERNAL_HOSTNAME="localhost" \
+#   	-e ADMIN_PASSWORD="demo" \
+#   	-e DISABLE_INTERNAL_MYSQL=true \
+#   	-e GRR_MYSQL_HOSTNAME=127.0.0.1 \
+#   	-e GRR_MYSQL_PASSWORD="${ROOT_MYSQL_PASS}" \
+#   	-v ~/grr-docker/etc:/usr/share/grr-server/install_data/etc \
+#    	grrdocker/xenial-dev
+
+FROM ubuntu:xenial
+LABEL maintainer="ahmed_elshafey@aucegypt.edu"
+WORKDIR /root/
+COPY install-docker-dev.sh /root/install-docker-dev.sh
+COPY docker-entrypoint.sh /root/docker-entrypoint.sh
+RUN chmod a+x /root/install-docker-dev.sh
+RUN chmod a+x /root/docker-entrypoint.sh
+WORKDIR /root/
+RUN sh ./install-docker-dev.sh
