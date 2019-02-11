@@ -19,8 +19,8 @@ PATH="${PATH}:/opt/google/chrome" LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL=
 cd ~ && git clone https://github.com/google/grr.git grr && cd grr
 travis/install_protobuf.sh linux
 export PROTOC=${HOME}/protobuf/bin/protoc
-set -ex
 
+set -ex
 virtualenv --python=/usr/bin/python2.7 ~/.virtualenv/GRR
 . ~/.virtualenv/GRR/bin/activate
 # Set default value for PROTOC if necessary.
@@ -44,15 +44,9 @@ pip install --no-cache-dir -f https://storage.googleapis.com/releases.grr-respon
 # Note that because of dependencies, order here is important.
 # Proto package.
 pip install -e grr/proto --progress-bar off
-# Base package, grr-response-core, depends on grr-response-proto.
-pip install -e grr/core --progress-bar off
-# Depends on grr-response-core
 pip install -e api_client/python --progress-bar off
-# Depends on grr-response-core
+pip install -e grr/core --progress-bar off
 pip install -e grr/client --progress-bar off
-# Depends on grr-response-client
 pip install -e grr/server/[mysqldatastore] --progress-bar off
-# Depends on grr-response-server and grr-api-client
 pip install -e grr/test --progress-bar off
-
 deactivate
