@@ -459,3 +459,13 @@ https://github.com/google/grr/tree/master/api_client/python#initializing-the-grr
 
 
 /home/naufal/Documents/auc/semesters/fall2018/seniorprj1/grr/api_client/python/grr_api_client/flow.py
+
+# Plugins
+
+Right now there are only output plugins. Whether or not we'll do input is another matter and it'll require work in grr_response_core and grr_response_server without proto, mostly code because it'll be all new apprently.
+
+Paths
+- grr/proto/grr_response_proto/output_plugin.proto
+  - This is where the proto for the plugins are defined, right now this has the proto for the EmailOutput and BigQueryOutput plugins and their arguments as well as generic plugin definition protos that are more interesting to us.
+- grr/server/grr_response_server/gui/api_plugins/output_plugin.py
+  - This is where the code for verifying the args is, it doesn't seem like this actually runs but it probably provides the rdf for the runner.
