@@ -3490,4 +3490,2110 @@ python grr/client/grr_response_client/client_build.py \
 
 
 ____%EOF_______ 
+
+
+____%BOF%____
+
+1. rseponse_server/gui/in wsgiapp.py, you can manipulate all http connections and methods between server and client.
+2. There u can also build access control token for requests...
+3. WHat the hell is that???:
+static/node_modules/uglify-js/node_modules/yargs/README.md
+72:    util.print(argv.fr ? 'Le perroquet dit: ' : 'The parrot says: ');
+415:If a `msg` string is given, it will be printed when the argument is missing,
+540:Examples will be printed out as part of the help message.
+548:A message to print at the end of the usage instructions, e.g.,
+568:Method to execute when a failure occurs, rather then printing the failure message.
+570:`fn` is called with the failure message that would have been printed.
+712:Print the usage data using the [`console`](https://nodejs.org/api/console.html) function `consoleLevel` for printing.
+722:Or, to print the usage data to `stdout` instead, you can specify the use of `console.log`:
+811:    .example('$0 hello', 'print the hello message!')
+819:    .example('$0 world', 'print the world message!')
+
+4. Interrogate button:: directs to discovery.py in InterrogateMixin: start
+5. Trying to overwrite the linux.yaml artifact on gui,got:
+Traceback (most recent call last):
+  File "/home/samanoudy/grr/grr/server/grr_response_server/gui/http_api.py", line 510, in HandleRequest
+    result = self.CallApiHandler(handler, args, token=token)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/gui/http_api.py", line 298, in CallApiHandler
+    result = handler.Handle(args, token=token)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/gui/api_plugins/artifact.py", line 92, in Handle
+    content, overwrite=True, overwrite_system_artifacts=False)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/artifact.py", line 506, in UploadArtifactYamlFile
+    overwrite_system_artifacts=overwrite_system_artifacts)
+  File "/home/samanoudy/grr/grr/core/grr_response_core/lib/utils.py", line 85, in NewFunction
+    return f(self, *args, **kw)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/artifact_registry.py", line 310, in RegisterArtifact
+    raise rdf_artifacts.ArtifactDefinitionError(artifact_name, details)
+ArtifactDefinitionError: AnacronFiles: system artifact cannot be overwritten
+
+6. GetPendingUserNotificationsCount is an API method that is meant
+    # to be invoked very often (every 10 seconds). So it's ideal
+    # for updating the CSRF (Cross-Site Request Forgery ) token. in wsgiapp:
+ See for more details:
+  # https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet
+
+7. Look at WSGIHandler at wsgiapp..
+8. Note that Werkzeug is The Python WSGI(Web_Server_Gateway_Interface) Utility Library 
+9. FirebaseWebAuthManager is the one used for authenticating admin to AdminUi page
+
+10. In http_api: build token; the token and is formed:
+message ACLToken {
+ expiry : RDFDatetime:
+    2019-02-26 16:47:18
+ process : u'GRRAdminUI'
+ reason : u''
+ username : u'admin'
+}
+
+11. rdfvalue.RDFDatetime.Now() is late by 2 hours;; why??
+
+12. look in http_api in call_api_handler: these are results:
+message ApiClient {
+ age : RDFDatetime:
+    2019-02-24 15:33:50
+ agent_info :   message ClientInformation {
+     build_time : u'Unknown'
+     client_description : u'GRR linux amd64'
+     client_name : u'GRR'
+     client_version : 3246
+    }
+ client_id : ApiClientId:
+    C.1be17baa0aeb80b5
+ first_seen_at : RDFDatetime:
+    2019-02-11 19:16:23
+ fleetspeak_enabled : False
+ hardware_info :   message HardwareInfo {
+    }
+ interfaces : [
+     message Interface {
+      addresses : [
+          message NetworkAddress {
+           address_type : INET
+           packed_bytes : RDFBytes:
+              c0a8010c
+          }
+          message NetworkAddress {
+           address_type : INET6
+           packed_bytes : RDFBytes:
+              fe80000000000000bf81e8413c3d2783
+          }
+       ]
+      ifname : u'wlp2s0'
+      mac_address : MacAddress:
+         blahblah
+     }
+     message Interface {
+      addresses : [
+          message NetworkAddress {
+           address_type : INET
+           packed_bytes : RDFBytes:
+              7f000001
+          }
+          message NetworkAddress {
+           address_type : INET6
+           packed_bytes : RDFBytes:
+              00000000000000000000000000000001
+          }
+       ]
+      ifname : u'lo'
+      mac_address : MacAddress:
+         000000000000
+     }
+     message Interface {
+      ifname : u'enp1s0'
+      mac_address : MacAddress:
+         ecf4bb8bbd60
+     }
+  ]
+ knowledge_base :   message KnowledgeBase {
+     fqdn : u'samanoudy-Inspiron-5537'
+     os : u'Linux'
+     os_major_version : 18
+     os_minor_version : 4
+     os_release : u'Ubuntu'
+     users : [
+         message User {
+          full_name : u'samanoudy,,,'
+          gid : 1000
+          homedir : u'/home/samanoudy'
+          last_logon : RDFDatetime:
+             2019-02-11 17:23:19
+          shell : u'/bin/bash'
+          uid : 1000
+          username : u'samanoudy'
+         }
+      ]
+    }
+ labels : [
+  ]
+ last_booted_at : RDFDatetime:
+    2019-02-11 17:20:04
+ last_clock : RDFDatetime:
+    2019-02-26 16:55:10
+ last_crash_at : RDFDatetime:
+    2019-02-24 15:33:50
+ last_seen_at : RDFDatetime:
+    2019-02-26 16:55:10
+ memory_size : ByteSize:
+    8239411200
+ os_info :   message Uname {
+     fqdn : u'samanoudy-Inspiron-5537'
+     install_date : RDFDatetime:
+        2019-01-08 13:39:29
+     kernel : u'4.15.0-43-generic'
+     machine : u'x86_64'
+     release : u'Ubuntu'
+     system : u'Linux'
+     version : u'18.4'
+    }
+ urn : ClientURN:
+    aff4:/C.1be17baa0aeb80b5
+ users : [
+     message User {
+      full_name : u'samanoudy,,,'
+      gid : 1000
+      homedir : u'/home/samanoudy'
+      last_logon : RDFDatetime:
+         2019-02-11 17:23:19
+      shell : u'/bin/bash'
+      uid : 1000
+      username : u'samanoudy'
+     }
+  ]
+ volumes : [
+     message Volume {
+      actual_available_allocation_units : 19327684
+      bytes_per_sector : 4096
+      sectors_per_allocation_unit : 1
+      total_allocation_units : 25671918
+      unixvolume :   message UnixVolume {
+          mount_point : u'/'
+         }
+     }
+  ]
+}
+
+
+13. Admin_UI cycle: api call is received in handle_api of wsgiapp which directs the call to http_api; in particular in response = http_api.RenderHttpResponse(request); which redirects to teh HTTPHandler in the same file in response = HTTP_REQUEST_HANDLER.HandleRequest(request); then makes a lot of checks over acls and other stuff preventing some attacks; then it redirects to         result = self.CallApiHandler(handler, args, token=token) which basically redirects the call to the handler object to handle the request; for example: a handler object could be <grr_response_server.gui.api_plugins.user.ApiGetPendingUserNotificationsCountHandler object at 0x7fdabd063490>; there the request is actually handled and the result is given back and Formatted As Json then wrapped using werkzeug_wrappers in _BuildResponse; in the handler object which is mainly located at gui/api_plugins; the actual flow gets started and executed 
+
+14. in func MatchRouter in http_api; you get both request.path, request.method);
+
+15. the routing map is as follows:
+Map([<Rule '/api/v2/users/me/notifications/pending/count' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a3d0>>,
+ <Rule '/api/users/me/notifications/pending/count' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a3d0>>,
+ <Rule '/api/v2/users/me/notifications/pending' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf310>>,
+ <Rule '/api/v2/users/me/approvals/cron-job' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa90>>,
+ <Rule '/api/v2/users/me/approvals/client' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/v2/users/me/approvals/hunt' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae90>>,
+ <Rule '/api/users/me/notifications/pending' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf310>>,
+ <Rule '/api/users/me/approvals/cron-job' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa90>>,
+ <Rule '/api/users/me/approvals/client' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/users/me/approvals/hunt' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae90>>,
+ <Rule '/api/v2/reflection/rdfvalue/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf390>>,
+ <Rule '/api/v2/reflection/aff4/attributes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a790>>,
+ <Rule '/api/v2/clients/labels/remove' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf490>>,
+ <Rule '/api/v2/clients/labels/add' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9464d0>>,
+ <Rule '/api/v2/users/me/notifications' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a7d0>>,
+ <Rule '/api/reflection/rdfvalue/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf390>>,
+ <Rule '/api/reflection/aff4/attributes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a790>>,
+ <Rule '/api/clients/labels/remove' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf490>>,
+ <Rule '/api/clients/labels/add' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9464d0>>,
+ <Rule '/api/users/me/notifications' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a7d0>>,
+ <Rule '/api/v2/output-plugins/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf2d0>>,
+ <Rule '/api/v2/reflection/file-encodings' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf250>>,
+ <Rule '/api/v2/reflection/api-methods' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a810>>,
+ <Rule '/api/v2/clients/kb-fields' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf210>>,
+ <Rule '/api/v2/clients/labels' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa10>>,
+ <Rule '/api/v2/config/binaries' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae50>>,
+ <Rule '/api/v2/users/approver-suggestions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a890>>,
+ <Rule '/api/v2/flows/descriptors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab90>>,
+ <Rule '/api/v2/stats/reports' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf3d0>>,
+ <Rule '/api/v2/users/me' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a090>>,
+ <Rule '/api/v2/users/me' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf510>>,
+ <Rule '/api/output-plugins/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf2d0>>,
+ <Rule '/api/reflection/file-encodings' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf250>>,
+ <Rule '/api/reflection/api-methods' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a810>>,
+ <Rule '/api/clients/kb-fields' (HEAD, GET) -> <grr_respo <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) ->nse_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf210>>,
+ <Rule '/api/clients/labels' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa10>>,
+ <Rule '/api/config/binaries' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae50>>,
+ <Rule '/api/users/approver-suggestions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a890>>,
+ <Rule '/api/flows/descriptors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab90>>,
+ <Rule '/api/stats/reports' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf3d0>>,
+ <Rule '/api/users/me' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a090>>,
+ <Rule '/api/users/me' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf510>>,
+ <Rule '/api/v2/cron-jobs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab10>>,
+ <Rule '/api/v2/artifacts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a8d0>>,
+ <Rule '/api/v2/cron-jobs' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9465d0>>,
+ <Rule '/api/v2/artifacts' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9467d0>>,
+ <Rule '/api/v2/artifacts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf5d0>>,
+ <Rule '/api/v2/clients' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf4d0>>,
+ <Rule '/api/v2/config' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a90>>,
+ <Rule '/api/v2/hunts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf1d0>>,
+ <Rule '/api/v2/hunts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9466d0>>,
+ <Rule '/api/cron-jobs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab10>>,
+ <Rule '/api/artifacts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a8d0>>,
+ <Rule '/api/cron-jobs' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9465d0>>,
+ <Rule '/api/artifacts' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9467d0>>,
+ <Rule '/api/artifacts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf5d0>>,
+ <Rule '/api/clients' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf4d0>>,
+ <Rule '/api/config' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a90>>,
+ <Rule '/api/hunts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf1d0>>,
+ <Rule '/api/hunts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9466d0>>,
+ <Rule '/api/v2/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a6d0>>,
+ <Rule '/api/v2/users/<username>/approvals/client/<client_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a650>>,
+ <Rule '/api/v2/users/<username>/approvals/hunt/<hunt_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a710>>,
+ <Rule '/api/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a6d0>>,
+ <Rule '/api/users/<username>/approvals/client/<client_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a650>>,
+ <Rule '/api/users/<username>/approvals/hunt/<hunt_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a710>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ac50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94acd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/clients/<client_id>/vfs-blob/<vfs_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a1d0>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ac50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94acd0>>,
+ <Rule '/api/hunts/<hunt_id>/results/clients/<client_id>/vfs-blob/<vfs_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a1d0>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946c50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f90>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f10>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/actions/cancel' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946510>>,
+ <Rule '/api/v2/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b50>>,
+ <Rule '/api/v2/users/<username>/approvals/client/<client_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946950>>,
+ <Rule '/api/v2/users/<username>/approvals/hunt/<hunt_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a110>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946c50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f90>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f10>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/actions/cancel' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946510>>,
+ <Rule '/api/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b50>>,
+ <Rule '/api/users/<username>/approvals/client/<client_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946950>>,
+ <Rule '/api/users/<username>/approvals/hunt/<hunt_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a110>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-decoded-blob/<decoder_name>/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946bd0>>,
+ <Rule '/api/v2/clients/<client_id>/actions/interrogate/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a310>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad90>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94add0>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94abd0>>,
+ <Rule '/api/v2/users/me/notifications/pending/<timestamp>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946890>>,
+ <Rule '/api/v2/users/me/approvals/cron-job/<cron_job_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946650>>,
+ <Rule '/api/v2/users/me/approvals/client/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/v2/users/me/approvals/client/<client_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946590>>,
+ <Rule '/api/v2/users/me/approvals/hunt/<hunt_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946710>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf050>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf0d0>>,
+ <Rule '/api/clients/<client_id>/vfs-decoded-blob/<decoder_name>/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946bd0>>,
+ <Rule '/api/clients/<client_id>/actions/interrogate/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a310>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad90>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94add0>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94abd0>>,
+ <Rule '/api/users/me/notifications/pending/<timestamp>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946890>>,
+ <Rule '/api/users/me/approvals/cron-job/<cron_job_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946650>>,
+ <Rule '/api/users/me/approvals/client/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/users/me/approvals/client/<client_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946590>>,
+ <Rule '/api/users/me/approvals/hunt/<hunt_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946710>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf050>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf0d0>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/actions/force-run' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9468d0>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/runs/<run_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b90>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-refresh-operations/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a590>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-download-command/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e10>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-version-times/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e90>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-files-archive/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-timeline-csv/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a610>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-timeline/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a5d0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-decoders/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-details/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d90>>,
+ <Rule '/api/v2/clients/<client_id>/load-stats/<metric>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946990>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-update/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a4d0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-index/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-text/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-blob/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d10>>,
+ <Rule '/api/v2/clients/<client_id>/actions/interrogate' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a750>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ed0>>,
+ <Rule '/api/v2/config/binaries-blobs/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a050>>,
+ <Rule '/api/v2/config/binaries/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946fd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946cd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a290>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a210>>,
+ <Rule '/api/v2/hunts/<hunt_id>/clients/<client_status>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aed0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/actions/force-run' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9468d0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/runs/<run_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b90>>,
+ <Rule '/api/clients/<client_id>/vfs-refresh-operations/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a590>>,
+ <Rule '/api/clients/<client_id>/vfs-download-command/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e10>>,
+ <Rule '/api/clients/<client_id>/vfs-version-times/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e90>>,
+ <Rule '/api/clients/<client_id>/vfs-files-archive/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/clients/<client_id>/vfs-timeline-csv/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a610>>,
+ <Rule '/api/clients/<client_id>/vfs-timeline/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a5d0>>,
+ <Rule '/api/clients/<client_id>/vfs-decoders/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d50>>,
+ <Rule '/api/clients/<client_id>/vfs-details/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d90>>,
+ <Rule '/api/clients/<client_id>/load-stats/<metric>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946990>>,
+ <Rule '/api/clients/<client_id>/vfs-update/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a4d0>>,
+ <Rule '/api/clients/<client_id>/vfs-index/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/clients/<client_id>/vfs-text/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e50>>,
+ <Rule '/api/clients/<client_id>/vfs-blob/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d10>>,
+ <Rule '/api/clients/<client_id>/actions/interrogate' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a750>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ed0>>,
+ <Rule '/api/config/binaries-blobs/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a050>>,
+ <Rule '/api/config/binaries/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946fd0>>,
+ <Rule '/api/hunts/<hunt_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946cd0>>,
+ <Rule '/api/hunts/<hunt_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a290>>,
+ <Rule '/api/hunts/<hunt_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a210>>,
+ <Rule '/api/hunts/<hunt_id>/clients/<client_status>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aed0>>,
+ <Rule '/api/v2/reflection/rdfvalue/<type>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a450>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/runs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aad0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-refresh-operations' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946790>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-files-archive/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/v2/clients/<client_id>/action-requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a950>>,
+ <Rule '/api/v2/clients/<client_id>/version-times' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a10>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-update' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf590>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-index/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/v2/clients/<client_id>/versions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a50>>,
+ <Rule '/api/v2/clients/<client_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a9d0>>,
+ <Rule '/api/v2/clients/<client_id>/last-ip' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a390>>,
+ <Rule '/api/v2/clients/<client_id>/flows' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae10>>,
+ <Rule '/api/v2/clients/<client_id>/flows' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946690>>,
+ <Rule '/api/v2/stats/reports/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a490>>,
+ <Rule '/api/v2/hunts/<hunt_id>/client-completion-stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a150>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf150>>,
+ <Rule '/api/v2/hunts/<hunt_id>/context' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a190>>,
+ <Rule '/api/v2/hunts/<hunt_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af10>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf190>>,
+ <Rule '/api/v2/hunts/<hunt_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af50>>,
+ <Rule '/api/v2/hunts/<hunt_id>/stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a2d0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af90>>,
+ <Rule '/api/reflection/rdfvalue/<type>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a450>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/runs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aad0>>,
+ <Rule '/api/clients/<client_id>/vfs-refresh-operations' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946790>>,
+ <Rule '/api/clients/<client_id>/vfs-files-archive/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/clients/<client_id>/action-requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a950>>,
+ <Rule '/api/clients/<client_id>/version-times' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a10>>,
+ <Rule '/api/clients/<client_id>/vfs-update' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf590>>,
+ <Rule '/api/clients/<client_id>/vfs-index/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/clients/<client_id>/versions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a50>>,
+ <Rule '/api/clients/<client_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a9d0>>,
+ <Rule '/api/clients/<client_id>/last-ip' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a390>>,
+ <Rule '/api/clients/<client_id>/flows' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae10>>,
+ <Rule '/api/clients/<client_id>/flows' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946690>>,
+ <Rule '/api/stats/reports/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a490>>,
+ <Rule '/api/hunts/<hunt_id>/client-completion-stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a150>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf150>>,
+ <Rule '/api/hunts/<hunt_id>/context' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a190>>,
+ <Rule '/api/hunts/<hunt_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af10>>,
+ <Rule '/api/hunts/<hunt_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf190>>,
+ <Rule '/api/hunts/<hunt_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af50>>,
+ <Rule '/api/hunts/<hunt_id>/stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a2d0>>,
+ <Rule '/api/hunts/<hunt_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af90>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b10>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946810>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf410>>,
+ <Rule '/api/v2/clients/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946910>>,
+ <Rule '/api/v2/config/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ad0>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf450>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946850>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a0d0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b10>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946810>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf410>>,
+ <Rule '/api/clients/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946910>>,
+ <Rule '/api/config/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ad0>>,
+ <Rule '/api/hunts/<hunt_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf450>>,
+ <Rule '/api/hunts/<hunt_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946850>>,
+ <Rule '/api/hunts/<hunt_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a0d0>>])
+::ffff:127.0.0.1 - - [01/Mar/2019 10:28:53] "GET /api/clients/C.1be17baa0aeb80b5 HTTP/1.1" 200 4164
+Map([<Rule '/api/v2/users/me/notifications/pending/count' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a3d0>>,
+ <Rule '/api/users/me/notifications/pending/count' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a3d0>>,
+ <Rule '/api/v2/users/me/notifications/pending' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf310>>,
+ <Rule '/api/v2/users/me/approvals/cron-job' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa90>>,
+ <Rule '/api/v2/users/me/approvals/client' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/v2/users/me/approvals/hunt' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae90>>,
+ <Rule '/api/users/me/notifications/pending' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf310>>,
+ <Rule '/api/users/me/approvals/cron-job' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa90>>,
+ <Rule '/api/users/me/approvals/client' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/users/me/approvals/hunt' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae90>>,
+ <Rule '/api/v2/reflection/rdfvalue/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf390>>,
+ <Rule '/api/v2/reflection/aff4/attributes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a790>>,
+ <Rule '/api/v2/clients/labels/remove' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf490>>,
+ <Rule '/api/v2/clients/labels/add' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9464d0>>,
+ <Rule '/api/v2/users/me/notifications' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a7d0>>,
+ <Rule '/api/reflection/rdfvalue/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf390>>,
+ <Rule '/api/reflection/aff4/attributes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a790>>,
+ <Rule '/api/clients/labels/remove' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf490>>,
+ <Rule '/api/clients/labels/add' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9464d0>>,
+ <Rule '/api/users/me/notifications' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a7d0>>,
+ <Rule '/api/v2/output-plugins/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf2d0>>,
+ <Rule '/api/v2/reflection/file-encodings' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf250>>,
+ <Rule '/api/v2/reflection/api-methods' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a810>>,
+ <Rule '/api/v2/clients/kb-fields' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf210>>,
+ <Rule '/api/v2/clients/labels' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa10>>,
+ <Rule '/api/v2/config/binaries' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae50>>,
+ <Rule '/api/v2/users/approver-suggestions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a890>>,
+ <Rule '/api/v2/flows/descriptors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab90>>,
+ <Rule '/api/v2/stats/reports' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf3d0>>,
+ <Rule '/api/v2/users/me' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a090>>,
+ <Rule '/api/v2/users/me' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf510>>,
+ <Rule '/api/output-plugins/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf2d0>>,
+ <Rule '/api/reflection/file-encodings' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf250>>,
+ <Rule '/api/reflection/api-methods' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a810>>,
+ <Rule '/api/clients/kb-fields' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf210>>,
+ <Rule '/api/clients/labels' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa10>>,
+ <Rule '/api/config/binaries' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae50>>,
+ <Rule '/api/users/approver-suggestions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a890>>,
+ <Rule '/api/flows/descriptors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab90>>,
+ <Rule '/api/stats/reports' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf3d0>>,
+ <Rule '/api/users/me' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a090>>,
+ <Rule '/api/users/me' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf510>>,
+ <Rule '/api/v2/cron-jobs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab10>>,
+ <Rule '/api/v2/artifacts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a8d0>>,
+ <Rule '/api/v2/cron-jobs' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9465d0>>,
+ <Rule '/api/v2/artifacts' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9467d0>>,
+ <Rule '/api/v2/artifacts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf5d0>>,
+ <Rule '/api/v2/clients' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf4d0>>,
+ <Rule '/api/v2/config' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a90>>,
+ <Rule '/api/v2/hunts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf1d0>>,
+ <Rule '/api/v2/hunts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9466d0>>,
+ <Rule '/api/cron-jobs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab10>>,
+ <Rule '/api/artifacts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a8d0>>,
+ <Rule '/api/cron-jobs' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9465d0>>,
+ <Rule '/api/artifacts' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9467d0>>,
+ <Rule '/api/artifacts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf5d0>>,
+ <Rule '/api/clients' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf4d0>>,
+ <Rule '/api/config' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a90>>,
+ <Rule '/api/hunts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf1d0>>,
+ <Rule '/api/hunts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9466d0>>,
+ <Rule '/api/v2/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a6d0>>,
+ <Rule '/api/v2/users/<username>/approvals/client/<client_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a650>>,
+ <Rule '/api/v2/users/<username>/approvals/hunt/<hunt_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a710>>,
+ <Rule '/api/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a6d0>>,
+ <Rule '/api/users/<username>/approvals/client/<client_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a650>>,
+ <Rule '/api/users/<username>/approvals/hunt/<hunt_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a710>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ac50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94acd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/clients/<client_id>/vfs-blob/<vfs_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a1d0>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ac50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94acd0>>,
+ <Rule '/api/hunts/<hunt_id>/results/clients/<client_id>/vfs-blob/<vfs_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a1d0>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946c50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f90>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f10>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/actions/cancel' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946510>>,
+ <Rule '/api/v2/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b50>>,
+ <Rule '/api/v2/users/<username>/approvals/client/<client_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946950>>,
+ <Rule '/api/v2/users/<username>/approvals/hunt/<hunt_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a110>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946c50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f90>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f10>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/actions/cancel' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946510>>,
+ <Rule '/api/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b50>>,
+ <Rule '/api/users/<username>/approvals/client/<client_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946950>>,
+ <Rule '/api/users/<username>/approvals/hunt/<hunt_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a110>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-decoded-blob/<decoder_name>/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946bd0>>,
+ <Rule '/api/v2/clients/<client_id>/actions/interrogate/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a310>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad90>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94add0>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94abd0>>,
+ <Rule '/api/v2/users/me/notifications/pending/<timestamp>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946890>>,
+ <Rule '/api/v2/users/me/approvals/cron-job/<cron_job_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946650>>,
+ <Rule '/api/v2/users/me/approvals/client/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/v2/users/me/approvals/client/<client_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946590>>,
+ <Rule '/api/v2/users/me/approvals/hunt/<hunt_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946710>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf050>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf0d0>>,
+ <Rule '/api/clients/<client_id>/vfs-decoded-blob/<decoder_name>/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946bd0>>,
+ <Rule '/api/clients/<client_id>/actions/interrogate/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a310>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad90>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94add0>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94abd0>>,
+ <Rule '/api/users/me/notifications/pending/<timestamp>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946890>>,
+ <Rule '/api/users/me/approvals/cron-job/<cron_job_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946650>>,
+ <Rule '/api/users/me/approvals/client/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/users/me/approvals/client/<client_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946590>>,
+ <Rule '/api/users/me/approvals/hunt/<hunt_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946710>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf050>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf0d0>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/actions/force-run' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9468d0>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/runs/<run_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b90>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-refresh-operations/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a590>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-download-command/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e10>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-version-times/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e90>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-files-archive/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-timeline-csv/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a610>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-timeline/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a5d0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-decoders/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-details/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d90>>,
+ <Rule '/api/v2/clients/<client_id>/load-stats/<metric>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946990>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-update/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a4d0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-index/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-text/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-blob/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d10>>,
+ <Rule '/api/v2/clients/<client_id>/actions/interrogate' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a750>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ed0>>,
+ <Rule '/api/v2/config/binaries-blobs/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a050>>,
+ <Rule '/api/v2/config/binaries/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946fd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946cd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a290>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a210>>,
+ <Rule '/api/v2/hunts/<hunt_id>/clients/<client_status>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aed0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/actions/force-run' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9468d0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/runs/<run_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b90>>,
+ <Rule '/api/clients/<client_id>/vfs-refresh-operations/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a590>>,
+ <Rule '/api/clients/<client_id>/vfs-download-command/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e10>>,
+ <Rule '/api/clients/<client_id>/vfs-version-times/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e90>>,
+ <Rule '/api/clients/<client_id>/vfs-files-archive/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/clients/<client_id>/vfs-timeline-csv/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a610>>,
+ <Rule '/api/clients/<client_id>/vfs-timeline/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a5d0>>,
+ <Rule '/api/clients/<client_id>/vfs-decoders/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d50>>,
+ <Rule '/api/clients/<client_id>/vfs-details/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d90>>,
+ <Rule '/api/clients/<client_id>/load-stats/<metric>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946990>>,
+ <Rule '/api/clients/<client_id>/vfs-update/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a4d0>>,
+ <Rule '/api/clients/<client_id>/vfs-index/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/clients/<client_id>/vfs-text/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e50>>,
+ <Rule '/api/clients/<client_id>/vfs-blob/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d10>>,
+ <Rule '/api/clients/<client_id>/actions/interrogate' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a750>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ed0>>,
+ <Rule '/api/config/binaries-blobs/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a050>>,
+ <Rule '/api/config/binaries/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946fd0>>,
+ <Rule '/api/hunts/<hunt_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946cd0>>,
+ <Rule '/api/hunts/<hunt_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a290>>,
+ <Rule '/api/hunts/<hunt_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a210>>,
+ <Rule '/api/hunts/<hunt_id>/clients/<client_status>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aed0>>,
+ <Rule '/api/v2/reflection/rdfvalue/<type>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a450>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/runs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aad0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-refresh-operations' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946790>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-files-archive/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/v2/clients/<client_id>/action-requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a950>>,
+ <Rule '/api/v2/clients/<client_id>/version-times' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a10>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-update' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf590>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-index/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/v2/clients/<client_id>/versions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a50>>,
+ <Rule '/api/v2/clients/<client_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a9d0>>,
+ <Rule '/api/v2/clients/<client_id>/last-ip' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a390>>,
+ <Rule '/api/v2/clients/<client_id>/flows' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae10>>,
+ <Rule '/api/v2/clients/<client_id>/flows' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946690>>,
+ <Rule '/api/v2/stats/reports/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a490>>,
+ <Rule '/api/v2/hunts/<hunt_id>/client-completion-stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a150>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf150>>,
+ <Rule '/api/v2/hunts/<hunt_id>/context' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a190>>,
+ <Rule '/api/v2/hunts/<hunt_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af10>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf190>>,
+ <Rule '/api/v2/hunts/<hunt_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af50>>,
+ <Rule '/api/v2/hunts/<hunt_id>/stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a2d0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af90>>,
+ <Rule '/api/reflection/rdfvalue/<type>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a450>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/runs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aad0>>,
+ <Rule '/api/clients/<client_id>/vfs-refresh-operations' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946790>>,
+ <Rule '/api/clients/<client_id>/vfs-files-archive/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/clients/<client_id>/action-requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a950>>,
+ <Rule '/api/clients/<client_id>/version-times' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a10>>,
+ <Rule '/api/clients/<client_id>/vfs-update' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf590>>,
+ <Rule '/api/clients/<client_id>/vfs-index/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/clients/<client_id>/versions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a50>>,
+ <Rule '/api/clients/<client_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a9d0>>,
+ <Rule '/api/clients/<client_id>/last-ip' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a390>>,
+ <Rule '/api/clients/<client_id>/flows' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae10>>,
+ <Rule '/api/clients/<client_id>/flows' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946690>>,
+ <Rule '/api/stats/reports/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a490>>,
+ <Rule '/api/hunts/<hunt_id>/client-completion-stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a150>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf150>>,
+ <Rule '/api/hunts/<hunt_id>/context' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a190>>,
+ <Rule '/api/hunts/<hunt_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af10>>,
+ <Rule '/api/hunts/<hunt_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf190>>,
+ <Rule '/api/hunts/<hunt_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af50>>,
+ <Rule '/api/hunts/<hunt_id>/stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a2d0>>,
+ <Rule '/api/hunts/<hunt_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af90>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b10>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946810>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf410>>,
+ <Rule '/api/v2/clients/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946910>>,
+ <Rule '/api/v2/config/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ad0>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf450>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946850>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a0d0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b10>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946810>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf410>>,
+ <Rule '/api/clients/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946910>>,
+ <Rule '/api/config/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ad0>>,
+ <Rule '/api/hunts/<hunt_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf450>>,
+ <Rule '/api/hunts/<hunt_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946850>>,
+ <Rule '/api/hunts/<hunt_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a0d0>>])Map([<Rule '/api/v2/users/me/notifications/pending/count' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a3d0>>,
+ <Rule '/api/users/me/notifications/pending/count' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a3d0>>,
+ <Rule '/api/v2/users/me/notifications/pending' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf310>>,
+ <Rule '/api/v2/users/me/approvals/cron-job' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa90>>,
+ <Rule '/api/v2/users/me/approvals/client' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/v2/users/me/approvals/hunt' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae90>>,
+ <Rule '/api/users/me/notifications/pending' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf310>>,
+ <Rule '/api/users/me/approvals/cron-job' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa90>>,
+ <Rule '/api/users/me/approvals/client' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/users/me/approvals/hunt' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae90>>,
+ <Rule '/api/v2/reflection/rdfvalue/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf390>>,
+ <Rule '/api/v2/reflection/aff4/attributes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a790>>,
+ <Rule '/api/v2/clients/labels/remove' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf490>>,
+ <Rule '/api/v2/clients/labels/add' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9464d0>>,
+ <Rule '/api/v2/users/me/notifications' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a7d0>>,
+ <Rule '/api/reflection/rdfvalue/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf390>>,
+ <Rule '/api/reflection/aff4/attributes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a790>>,
+ <Rule '/api/clients/labels/remove' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf490>>,
+ <Rule '/api/clients/labels/add' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9464d0>>,
+ <Rule '/api/users/me/notifications' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a7d0>>,
+ <Rule '/api/v2/output-plugins/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf2d0>>,
+ <Rule '/api/v2/reflection/file-encodings' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf250>>,
+ <Rule '/api/v2/reflection/api-methods' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a810>>,
+ <Rule '/api/v2/clients/kb-fields' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf210>>,
+ <Rule '/api/v2/clients/labels' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa10>>,
+ <Rule '/api/v2/config/binaries' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae50>>,
+ <Rule '/api/v2/users/approver-suggestions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a890>>,
+ <Rule '/api/v2/flows/descriptors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab90>>,
+ <Rule '/api/v2/stats/reports' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf3d0>>,
+ <Rule '/api/v2/users/me' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a090>>,
+ <Rule '/api/v2/users/me' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf510>>,
+ <Rule '/api/output-plugins/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf2d0>>,
+ <Rule '/api/reflection/file-encodings' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf250>>,
+ <Rule '/api/reflection/api-methods' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a810>>,
+ <Rule '/api/clients/kb-fields' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf210>>,
+ <Rule '/api/clients/labels' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa10>>,
+ <Rule '/api/config/binaries' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae50>>,
+ <Rule '/api/users/approver-suggestions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a890>>,
+ <Rule '/api/flows/descriptors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab90>>,
+ <Rule '/api/stats/reports' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf3d0>>,
+ <Rule '/api/users/me' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a090>>,
+ <Rule '/api/users/me' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf510>>,
+ <Rule '/api/v2/cron-jobs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab10>>,
+ <Rule '/api/v2/artifacts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a8d0>>,
+ <Rule '/api/v2/cron-jobs' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9465d0>>,
+ <Rule '/api/v2/artifacts' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9467d0>>,
+ <Rule '/api/v2/artifacts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf5d0>>,
+ <Rule '/api/v2/clients' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf4d0>>,
+ <Rule '/api/v2/config' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a90>>,
+ <Rule '/api/v2/hunts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf1d0>>,
+ <Rule '/api/v2/hunts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9466d0>>,
+ <Rule '/api/cron-jobs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab10>>,
+ <Rule '/api/artifacts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a8d0>>,
+ <Rule '/api/cron-jobs' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9465d0>>,
+ <Rule '/api/artifacts' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9467d0>>,
+ <Rule '/api/artifacts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf5d0>>,
+ <Rule '/api/clients' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf4d0>>,
+ <Rule '/api/config' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a90>>,
+ <Rule '/api/hunts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf1d0>>,
+ <Rule '/api/hunts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9466d0>>,
+ <Rule '/api/v2/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a6d0>>,
+ <Rule '/api/v2/users/<username>/approvals/client/<client_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a650>>,
+ <Rule '/api/v2/users/<username>/approvals/hunt/<hunt_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a710>>,
+ <Rule '/api/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a6d0>>,
+ <Rule '/api/users/<username>/approvals/client/<client_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a650>>,
+ <Rule '/api/users/<username>/approvals/hunt/<hunt_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a710>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ac50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94acd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/clients/<client_id>/vfs-blob/<vfs_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a1d0>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ac50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94acd0>>,
+ <Rule '/api/hunts/<hunt_id>/results/clients/<client_id>/vfs-blob/<vfs_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a1d0>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946c50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f90>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f10>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/actions/cancel' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946510>>,
+ <Rule '/api/v2/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b50>>,
+ <Rule '/api/v2/users/<username>/approvals/client/<client_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946950>>,
+ <Rule '/api/v2/users/<username>/approvals/hunt/<hunt_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a110>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946c50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f90>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f10>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/actions/cancel' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946510>>,
+ <Rule '/api/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b50>>,
+ <Rule '/api/users/<username>/approvals/client/<client_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946950>>,
+ <Rule '/api/users/<username>/approvals/hunt/<hunt_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a110>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-decoded-blob/<decoder_name>/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946bd0>>,
+ <Rule '/api/v2/clients/<client_id>/actions/interrogate/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a310>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad90>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94add0>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94abd0>>,
+ <Rule '/api/v2/users/me/notifications/pending/<timestamp>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946890>>,
+ <Rule '/api/v2/users/me/approvals/cron-job/<cron_job_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946650>>,
+ <Rule '/api/v2/users/me/approvals/client/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/v2/users/me/approvals/client/<client_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946590>>,
+ <Rule '/api/v2/users/me/approvals/hunt/<hunt_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946710>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf050>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf0d0>>,
+ <Rule '/api/clients/<client_id>/vfs-decoded-blob/<decoder_name>/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946bd0>>,
+ <Rule '/api/clients/<client_id>/actions/interrogate/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a310>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad90>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94add0>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94abd0>>,
+ <Rule '/api/users/me/notifications/pending/<timestamp>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946890>>,
+ <Rule '/api/users/me/approvals/cron-job/<cron_job_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946650>>,
+ <Rule '/api/users/me/approvals/client/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/users/me/approvals/client/<client_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946590>>,
+ <Rule '/api/users/me/approvals/hunt/<hunt_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946710>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf050>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf0d0>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/actions/force-run' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9468d0>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/runs/<run_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b90>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-refresh-operations/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a590>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-download-command/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e10>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-version-times/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e90>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-files-archive/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-timeline-csv/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a610>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-timeline/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a5d0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-decoders/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-details/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d90>>,
+ <Rule '/api/v2/clients/<client_id>/load-stats/<metric>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946990>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-update/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a4d0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-index/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-text/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-blob/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d10>>,
+ <Rule '/api/v2/clients/<client_id>/actions/interrogate' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a750>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ed0>>,
+ <Rule '/api/v2/config/binaries-blobs/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a050>>,
+ <Rule '/api/v2/config/binaries/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946fd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946cd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a290>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a210>>,
+ <Rule '/api/v2/hunts/<hunt_id>/clients/<client_status>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aed0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/actions/force-run' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9468d0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/runs/<run_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b90>>,
+ <Rule '/api/clients/<client_id>/vfs-refresh-operations/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a590>>,
+ <Rule '/api/clients/<client_id>/vfs-download-command/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e10>>,
+ <Rule '/api/clients/<client_id>/vfs-version-times/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e90>>,
+ <Rule '/api/clients/<client_id>/vfs-files-archive/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/clients/<client_id>/vfs-timeline-csv/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a610>>,
+ <Rule '/api/clients/<client_id>/vfs-timeline/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a5d0>>,
+ <Rule '/api/clients/<client_id>/vfs-decoders/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d50>>,
+ <Rule '/api/clients/<client_id>/vfs-details/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d90>>,
+ <Rule '/api/clients/<client_id>/load-stats/<metric>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946990>>,
+ <Rule '/api/clients/<client_id>/vfs-update/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a4d0>>,
+ <Rule '/api/clients/<client_id>/vfs-index/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/clients/<client_id>/vfs-text/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e50>>,
+ <Rule '/api/clients/<client_id>/vfs-blob/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d10>>,
+ <Rule '/api/clients/<client_id>/actions/interrogate' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a750>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ed0>>,
+ <Rule '/api/config/binaries-blobs/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a050>>,
+ <Rule '/api/config/binaries/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946fd0>>,
+ <Rule '/api/hunts/<hunt_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946cd0>>,
+ <Rule '/api/hunts/<hunt_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a290>>,
+ <Rule '/api/hunts/<hunt_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a210>>,
+ <Rule '/api/hunts/<hunt_id>/clients/<client_status>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aed0>>,
+ <Rule '/api/v2/reflection/rdfvalue/<type>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a450>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/runs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aad0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-refresh-operations' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946790>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-files-archive/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/v2/clients/<client_id>/action-requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a950>>,
+ <Rule '/api/v2/clients/<client_id>/version-times' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a10>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-update' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf590>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-index/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/v2/clients/<client_id>/versions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a50>>,
+ <Rule '/api/v2/clients/<client_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a9d0>>,
+ <Rule '/api/v2/clients/<client_id>/last-ip' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a390>>,
+ <Rule '/api/v2/clients/<client_id>/flows' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae10>>,
+ <Rule '/api/v2/clients/<client_id>/flows' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946690>>,
+ <Rule '/api/v2/stats/reports/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a490>>,
+ <Rule '/api/v2/hunts/<hunt_id>/client-completion-stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a150>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf150>>,
+ <Rule '/api/v2/hunts/<hunt_id>/context' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a190>>,
+ <Rule '/api/v2/hunts/<hunt_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af10>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf190>>,
+ <Rule '/api/v2/hunts/<hunt_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af50>>,
+ <Rule '/api/v2/hunts/<hunt_id>/stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a2d0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af90>>,
+ <Rule '/api/reflection/rdfvalue/<type>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a450>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/runs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aad0>>,
+ <Rule '/api/clients/<client_id>/vfs-refresh-operations' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946790>>,
+ <Rule '/api/clients/<client_id>/vfs-files-archive/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/clients/<client_id>/action-requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a950>>,
+ <Rule '/api/clients/<client_id>/version-times' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a10>>,
+ <Rule '/api/clients/<client_id>/vfs-update' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf590>>,
+ <Rule '/api/clients/<client_id>/vfs-index/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/clients/<client_id>/versions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a50>>,
+ <Rule '/api/clients/<client_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a9d0>>,
+ <Rule '/api/clients/<client_id>/last-ip' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a390>>,
+ <Rule '/api/clients/<client_id>/flows' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae10>>,
+ <Rule '/api/clients/<client_id>/flows' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946690>>,
+ <Rule '/api/stats/reports/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a490>>,
+ <Rule '/api/hunts/<hunt_id>/client-completion-stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a150>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf150>>,
+ <Rule '/api/hunts/<hunt_id>/context' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a190>>,
+ <Rule '/api/hunts/<hunt_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af10>>,
+ <Rule '/api/hunts/<hunt_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf190>>,
+ <Rule '/api/hunts/<hunt_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af50>>,
+ <Rule '/api/hunts/<hunt_id>/stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a2d0>>,
+ <Rule '/api/hunts/<hunt_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af90>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b10>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946810>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf410>>,
+ <Rule '/api/v2/clients/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946910>>,
+ <Rule '/api/v2/config/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ad0>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf450>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946850>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a0d0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b10>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946810>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf410>>,
+ <Rule '/api/clients/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946910>>,
+ <Rule '/api/config/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ad0>>,
+ <Rule '/api/hunts/<hunt_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf450>>,
+ <Rule '/api/hunts/<hunt_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946850>>,
+ <Rule '/api/hunts/<hunt_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a0d0>>])
+
+Map([<Rule '/api/v2/users/me/notifications/pending/count' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a3d0>>,
+ <Rule '/api/users/me/notifications/pending/count' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a3d0>>,
+ <Rule '/api/v2/users/me/notifications/pending' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf310>>,
+ <Rule '/api/v2/users/me/approvals/cron-job' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa90>>,
+ <Rule '/api/v2/users/me/approvals/client' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/v2/users/me/approvals/hunt' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae90>>,
+ <Rule '/api/users/me/notifications/pending' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf310>>,
+ <Rule '/api/users/me/approvals/cron-job' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa90>>,
+ <Rule '/api/users/me/approvals/client' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/users/me/approvals/hunt' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae90>>,
+ <Rule '/api/v2/reflection/rdfvalue/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf390>>,
+ <Rule '/api/v2/reflection/aff4/attributes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a790>>,
+ <Rule '/api/v2/clients/labels/remove' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf490>>,
+ <Rule '/api/v2/clients/labels/add' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9464d0>>,
+ <Rule '/api/v2/users/me/notifications' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a7d0>>,
+ <Rule '/api/reflection/rdfvalue/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf390>>,
+ <Rule '/api/reflection/aff4/attributes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a790>>,
+ <Rule '/api/clients/labels/remove' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf490>>,
+ <Rule '/api/clients/labels/add' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9464d0>>,
+ <Rule '/api/users/me/notifications' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a7d0>>,
+ <Rule '/api/v2/output-plugins/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf2d0>>,
+ <Rule '/api/v2/reflection/file-encodings' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf250>>,
+ <Rule '/api/v2/reflection/api-methods' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a810>>,
+ <Rule '/api/v2/clients/kb-fields' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf210>>,
+ <Rule '/api/v2/clients/labels' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa10>>,
+ <Rule '/api/v2/config/binaries' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae50>>,
+ <Rule '/api/v2/users/approver-suggestions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a890>>,
+ <Rule '/api/v2/flows/descriptors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab90>>,
+ <Rule '/api/v2/stats/reports' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf3d0>>,
+ <Rule '/api/v2/users/me' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a090>>,
+ <Rule '/api/v2/users/me' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf510>>,
+ <Rule '/api/output-plugins/all' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf2d0>>,
+ <Rule '/api/reflection/file-encodings' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf250>>,
+ <Rule '/api/reflection/api-methods' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a810>>,
+ <Rule '/api/clients/kb-fields' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf210>>,
+ <Rule '/api/clients/labels' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aa10>>,
+ <Rule '/api/config/binaries' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae50>>,
+ <Rule '/api/users/approver-suggestions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a890>>,
+ <Rule '/api/flows/descriptors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab90>>,
+ <Rule '/api/stats/reports' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf3d0>>,
+ <Rule '/api/users/me' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a090>>,
+ <Rule '/api/users/me' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf510>>,
+ <Rule '/api/v2/cron-jobs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab10>>,
+ <Rule '/api/v2/artifacts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a8d0>>,
+ <Rule '/api/v2/cron-jobs' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9465d0>>,
+ <Rule '/api/v2/artifacts' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9467d0>>,
+ <Rule '/api/v2/artifacts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf5d0>>,
+ <Rule '/api/v2/clients' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf4d0>>,
+ <Rule '/api/v2/config' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a90>>,
+ <Rule '/api/v2/hunts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf1d0>>,
+ <Rule '/api/v2/hunts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9466d0>>,
+ <Rule '/api/cron-jobs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab10>>,
+ <Rule '/api/artifacts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a8d0>>,
+ <Rule '/api/cron-jobs' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9465d0>>,
+ <Rule '/api/artifacts' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9467d0>>,
+ <Rule '/api/artifacts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf5d0>>,
+ <Rule '/api/clients' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf4d0>>,
+ <Rule '/api/config' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a90>>,
+ <Rule '/api/hunts' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf1d0>>,
+ <Rule '/api/hunts' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9466d0>>,
+ <Rule '/api/v2/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a6d0>>,
+ <Rule '/api/v2/users/<username>/approvals/client/<client_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a650>>,
+ <Rule '/api/v2/users/<username>/approvals/hunt/<hunt_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a710>>,
+ <Rule '/api/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a6d0>>,
+ <Rule '/api/users/<username>/approvals/client/<client_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a650>>,
+ <Rule '/api/users/<username>/approvals/hunt/<hunt_id>/<approval_id>/actions/grant' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a710>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ac50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94acd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/clients/<client_id>/vfs-blob/<vfs_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a1d0>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ac50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94acd0>>,
+ <Rule '/api/hunts/<hunt_id>/results/clients/<client_id>/vfs-blob/<vfs_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a1d0>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946c50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f90>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f10>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/actions/cancel' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946510>>,
+ <Rule '/api/v2/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b50>>,
+ <Rule '/api/v2/users/<username>/approvals/client/<client_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946950>>,
+ <Rule '/api/v2/users/<username>/approvals/hunt/<hunt_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a110>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946c50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f90>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946f10>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/actions/cancel' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946510>>,
+ <Rule '/api/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b50>>,
+ <Rule '/api/users/<username>/approvals/client/<client_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946950>>,
+ <Rule '/api/users/<username>/approvals/hunt/<hunt_id>/<approval_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a110>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-decoded-blob/<decoder_name>/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946bd0>>,
+ <Rule '/api/v2/clients/<client_id>/actions/interrogate/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a310>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad50>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad90>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94add0>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94abd0>>,
+ <Rule '/api/v2/users/me/notifications/pending/<timestamp>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946890>>,
+ <Rule '/api/v2/users/me/approvals/cron-job/<cron_job_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946650>>,
+ <Rule '/api/v2/users/me/approvals/client/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/v2/users/me/approvals/client/<client_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946590>>,
+ <Rule '/api/v2/users/me/approvals/hunt/<hunt_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946710>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf050>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf0d0>>,
+ <Rule '/api/clients/<client_id>/vfs-decoded-blob/<decoder_name>/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946bd0>>,
+ <Rule '/api/clients/<client_id>/actions/interrogate/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a310>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad50>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ad90>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94add0>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94abd0>>,
+ <Rule '/api/users/me/notifications/pending/<timestamp>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946890>>,
+ <Rule '/api/users/me/approvals/cron-job/<cron_job_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946650>>,
+ <Rule '/api/users/me/approvals/client/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a990>>,
+ <Rule '/api/users/me/approvals/client/<client_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946590>>,
+ <Rule '/api/users/me/approvals/hunt/<hunt_id>' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946710>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins/<plugin_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf050>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins/<plugin_id>/logs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf0d0>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/actions/force-run' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9468d0>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/runs/<run_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b90>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-refresh-operations/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a590>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-download-command/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e10>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-version-times/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e90>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-files-archive/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-timeline-csv/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a610>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-timeline/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a5d0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-decoders/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-details/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d90>>,
+ <Rule '/api/v2/clients/<client_id>/load-stats/<metric>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946990>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-update/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a4d0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-index/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-text/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e50>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-blob/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d10>>,
+ <Rule '/api/v2/clients/<client_id>/actions/interrogate' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a750>>,
+ <Rule '/api/v2/clients/<client_id>/flows/<flow_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ed0>>,
+ <Rule '/api/v2/config/binaries-blobs/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a050>>,
+ <Rule '/api/v2/config/binaries/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946fd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946cd0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a290>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a210>>,
+ <Rule '/api/v2/hunts/<hunt_id>/clients/<client_status>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aed0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/actions/force-run' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d9468d0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/runs/<run_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b90>>,
+ <Rule '/api/clients/<client_id>/vfs-refresh-operations/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a590>>,
+ <Rule '/api/clients/<client_id>/vfs-download-command/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e10>>,
+ <Rule '/api/clients/<client_id>/vfs-version-times/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e90>>,
+ <Rule '/api/clients/<client_id>/vfs-files-archive/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/clients/<client_id>/vfs-timeline-csv/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a610>>,
+ <Rule '/api/clients/<client_id>/vfs-timeline/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a5d0>>,
+ <Rule '/api/clients/<client_id>/vfs-decoders/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d50>>,
+ <Rule '/api/clients/<client_id>/vfs-details/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d90>>,
+ <Rule '/api/clients/<client_id>/load-stats/<metric>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946990>>,
+ <Rule '/api/clients/<client_id>/vfs-update/<operation_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a4d0>>,
+ <Rule '/api/clients/<client_id>/vfs-index/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/clients/<client_id>/vfs-text/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946e50>>,
+ <Rule '/api/clients/<client_id>/vfs-blob/<file_path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946d10>>,
+ <Rule '/api/clients/<client_id>/actions/interrogate' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a750>>,
+ <Rule '/api/clients/<client_id>/flows/<flow_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ed0>>,
+ <Rule '/api/config/binaries-blobs/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a050>>,
+ <Rule '/api/config/binaries/<type>/<path>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946fd0>>,
+ <Rule '/api/hunts/<hunt_id>/exported-results/<plugin_name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946cd0>>,
+ <Rule '/api/hunts/<hunt_id>/results/export-command' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a290>>,
+ <Rule '/api/hunts/<hunt_id>/results/files-archive' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a210>>,
+ <Rule '/api/hunts/<hunt_id>/clients/<client_status>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aed0>>,
+ <Rule '/api/v2/reflection/rdfvalue/<type>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a450>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>/runs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aad0>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-refresh-operations' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946790>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-files-archive/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/v2/clients/<client_id>/action-requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a950>>,
+ <Rule '/api/v2/clients/<client_id>/version-times' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a10>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-update' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf590>>,
+ <Rule '/api/v2/clients/<client_id>/vfs-index/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/v2/clients/<client_id>/versions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a50>>,
+ <Rule '/api/v2/clients/<client_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a9d0>>,
+ <Rule '/api/v2/clients/<client_id>/last-ip' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a390>>,
+ <Rule '/api/v2/clients/<client_id>/flows' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae10>>,
+ <Rule '/api/v2/clients/<client_id>/flows' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946690>>,
+ <Rule '/api/v2/stats/reports/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a490>>,
+ <Rule '/api/v2/hunts/<hunt_id>/client-completion-stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a150>>,
+ <Rule '/api/v2/hunts/<hunt_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf150>>,
+ <Rule '/api/v2/hunts/<hunt_id>/context' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a190>>,
+ <Rule '/api/v2/hunts/<hunt_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af10>>,
+ <Rule '/api/v2/hunts/<hunt_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf190>>,
+ <Rule '/api/v2/hunts/<hunt_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af50>>,
+ <Rule '/api/v2/hunts/<hunt_id>/stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a2d0>>,
+ <Rule '/api/v2/hunts/<hunt_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af90>>,
+ <Rule '/api/reflection/rdfvalue/<type>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a450>>,
+ <Rule '/api/cron-jobs/<cron_job_id>/runs' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94aad0>>,
+ <Rule '/api/clients/<client_id>/vfs-refresh-operations' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946790>>,
+ <Rule '/api/clients/<client_id>/vfs-files-archive/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a510>>,
+ <Rule '/api/clients/<client_id>/action-requests' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a950>>,
+ <Rule '/api/clients/<client_id>/version-times' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a10>>,
+ <Rule '/api/clients/<client_id>/vfs-update' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf590>>,
+ <Rule '/api/clients/<client_id>/vfs-index/' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ab50>>,
+ <Rule '/api/clients/<client_id>/versions' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946a50>>,
+ <Rule '/api/clients/<client_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a9d0>>,
+ <Rule '/api/clients/<client_id>/last-ip' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a390>>,
+ <Rule '/api/clients/<client_id>/flows' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94ae10>>,
+ <Rule '/api/clients/<client_id>/flows' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946690>>,
+ <Rule '/api/stats/reports/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a490>>,
+ <Rule '/api/hunts/<hunt_id>/client-completion-stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a150>>,
+ <Rule '/api/hunts/<hunt_id>/output-plugins' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf150>>,
+ <Rule '/api/hunts/<hunt_id>/context' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a190>>,
+ <Rule '/api/hunts/<hunt_id>/crashes' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af10>>,
+ <Rule '/api/hunts/<hunt_id>/results' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf190>>,
+ <Rule '/api/hunts/<hunt_id>/errors' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af50>>,
+ <Rule '/api/hunts/<hunt_id>/stats' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a2d0>>,
+ <Rule '/api/hunts/<hunt_id>/log' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94af90>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b10>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946810>>,
+ <Rule '/api/v2/cron-jobs/<cron_job_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf410>>,
+ <Rule '/api/v2/clients/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946910>>,
+ <Rule '/api/v2/config/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ad0>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf450>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946850>>,
+ <Rule '/api/v2/hunts/<hunt_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a0d0>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946b10>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946810>>,
+ <Rule '/api/cron-jobs/<cron_job_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf410>>,
+ <Rule '/api/clients/<client_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946910>>,
+ <Rule '/api/config/<name>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946ad0>>,
+ <Rule '/api/hunts/<hunt_id>' (PATCH) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2c8cf450>>,
+ <Rule '/api/hunts/<hunt_id>' (DELETE) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946850>>,
+ <Rule '/api/hunts/<hunt_id>' (HEAD, GET) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d94a0d0>>])
+
+
+16. OUTPUT_PLUGINS: in api_call_router:
+ @Category("Flows")
+  @ArgsType(api_flow.ApiGetExportedFlowResultsArgs)
+  @ResultBinaryStream()
+  @Http("GET", "/api/clients/<client_id>/flows/<path:flow_id>/"
+        "exported-results/<plugin_name>")
+  def GetExportedFlowResults(self, args, token=None):
+    """Stream flow results using one of the instant output plugins."""
+
+    raise NotImplementedError()
+
+17. Sample of the args sent in request:
+message ApiGetClientArgs {
+ client_id : ApiClientId:
+    C.1be17baa0aeb80b5
+}
+::ffff:127.0.0.1 - - [01/Mar/2019 11:14:08] "GET /api/clients/C.1be17baa0aeb80b5 HTTP/1.1" 200 4164
+message ApiGetLastClientIPAddressArgs {
+ client_id : ApiClientId:
+    C.1be17baa0aeb80b5
+}
+ message ApiListClientApprovalsArgs {
+ client_id : ApiClientId:
+    C.1be17baa0aeb80b5
+}
+::ffff:127.0.0.1 - - [01/Mar/2019 11:14:08] "GET /api/clients/C.1be17baa0aeb80b5/last-ip HTTP/1.1" 200 78
+
+18. # HEAD method is only used for checking the ACLs for particular API
+      # methods.
+
+19. handler gets the object name out of the router object and metadata method assoicated with it and attaches the args with it;
+so the importance lies in the handler objects to deal with thereafter
+
+20. <grr_response_server.gui.api_plugins.client.ApiInterrogateClientHandler object at 0x7f0c802108d0>
+for interrogate;
+
+21. """API handlers for accessing and searching clients and managing labels."""
+in response_server/gui/api_plugins/client
+
+
+23. entry to execute python code:
+ERROR:2019-03-01 12:05:20,285 7934 MainProcess 139745113081600 Thread-3 http_api:576] Error while processing /api/clients/C.1be17baa0aeb80b5/flows (POST) with ApiCreateFlowHandler: Executable binary None not found.
+Traceback (most recent call last):
+  File "/home/samanoudy/grr/grr/server/grr_response_server/gui/http_api.py", line 527, in HandleRequest
+    result = self.CallApiHandler(handler, args, token=token)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/gui/http_api.py", line 303, in CallApiHandler
+    result = handler.Handle(args, token=token)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/gui/api_plugins/flow.py", line 1315, in Handle
+    runner_args=runner_args)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/flow.py", line 308, in StartAFF4Flow
+    flow_obj.Start()
+  File "/home/samanoudy/grr/grr/server/grr_response_server/flows/general/administrative.py", line 960, in Start
+    raise flow.FlowError("Executable binary %s not found." % self.args.binary)
+FlowError: Executable binary None not found.
+
+24. uploading a pyton hack result:
+R) samanoudy@samanoudy-Inspiron-5537:~/grr/grr$ grr_config_updater upload_python --file=custom.py --platform=linux
+Using configuration <GrrConfigManager  file="/home/samanoudy/grr/grr/core/install_data/etc/grr-server.yaml"  file="/home/samanoudy/grr/grr/core/install_data/etc/server.local.yaml" >
+Uploaded to aff4:/config/python_hacks/linux/custom.py
+
+
+25. got the following error; no clue why:
+ERROR:2019-03-02 00:39:27,202 9179 MainProcess 139676136490752 Thread-206 wsgiapp:332] http exception: /third-party/jstree/themes/default/32px.png [GET]
+Traceback (most recent call last):
+  File "/home/samanoudy/grr/grr/server/grr_response_server/gui/wsgiapp.py", line 329, in __call__
+    endpoint, _ = matcher.match(request.path, request.method)
+  File "/home/samanoudy/.virtualenv/GRR/lib/python2.7/site-packages/werkzeug/routing.py", line 1563, in match
+    raise NotFound()
+NotFound: 404: Not Found
+::ffff:127.0.0.1 - - [02/Mar/2019 00:39:27] "GET /static/third-party/jstree/themes/default/32px.png HTTP/1.1" 404 233
+
+
+26. Lauch binary exampele of args:
+message ApiCreateFlowArgs {
+ client_id : ApiClientId:
+    C.1be17baa0aeb80b5
+ flow :   message ApiFlow {
+     args :   <LaunchBinaryArgs('message LaunchBinaryArgs {\n binary : RDFURN:\n    aff4:/config/python_hacks/linux/custom.py\n}')>
+     runner_args :   message FlowRunnerArgs {
+         output_plugins : [
+          ]
+        }
+    }
+ original_flow :   message ApiFlowReference {
+    }
+}
+
+
+The runner args:
+message FlowRunnerArgs {
+ flow_name : u'LaunchBinary'
+ output_plugins : [
+  ]
+}
+
+27. ApiCreateFlowHandler in api_pugins/flow:
+it redirects to response_server/flow in startaff4flow:   """The main factory function for creating and executing a new flow.
+
+28. Remember we want to take in the args: name of flows to be determined as a one flow and created thereafter;
+also; take the code as text from gui not as uploaded file
+
+29. Args received in res_server/flows is
+ message LaunchBinaryArgs {
+ binary : RDFURN:
+    aff4:/config/python_hacks/linux/custom.py
+}
+
+30. <class 'abc.LaunchBinary'> is the one found in registery when searching for flow name in registery
 	
+31. <class 'grr_response_server.flows.general.administrative.LaunchBinaryArgs'> is the type of args sent in LaunchBinary Message
+
+32. when starting a flow, make sure  whether data_store.RelationalDBFlowsEnabled():
+and never forget to create flow runner runner = flow_obj.CreateRunner(;
+and make sure u start either synchronously or asynchronusly by setting a certain flag;
+and then get appropriate flow urn which u can use in sth like the following: [[USE THE ABSTRACTION OF AFF4 FOR NOWWW]
+fd = aff4.FACTORY.Open(flow_id, aff4_type=flow.GRRFlow, token=token)
+return ApiFlow().InitFromAff4Object(fd, flow_id=flow_id.Basename())
+
+33. simple runner has the following: <class 'grr_response_server.flows.general.administrative.LaunchBinaryArgs'>
+<grr_response_server.flow_runner.FlowRunner object at 0x7fbaa8521a50>
+
+34. leave it to the runner to create the appropriate flow urn for the flow: for example:
+aff4:/C.1be17baa0aeb80b5/flows/F:E8FE09D2
+
+35. this is where launchbinary lies in the map:
+ <Rule '/api/clients/<client_id>/flows' (POST) -> <grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f3b2d946690>>,
+
+36. here is the router: 
+<grr_response_server.gui.api_call_router_without_checks.ApiCallRouterWithoutChecks object at 0x7efc51391dd0>
+
+37. here is the matcher: ( router_method_metadata, route_args_dict )
+(<grr_response_server.gui.api_call_router.RouterMethodMetadata object at 0x7f61504be850>, {'client_id': u'C.1be17baa0aeb80b5'})
+
+38. here is the request path:
+/api/clients/C.1be17baa0aeb80b5
+
+39. we use what was in 37 alongside request itself to create the request args; we end up having sth like thaT:
+message ApiCreateFlowArgs {
+ client_id : ApiClientId:
+    C.1be17baa0aeb80b5
+ flow :   message ApiFlow {
+     args :   <LaunchBinaryArgs('message LaunchBinaryArgs {\n binary : RDFURN:\n    aff4:/config/python_hacks/linux/custom.py\n}')>
+     runner_args :   message FlowRunnerArgs {
+         flow_name : u'LaunchBinary'
+         output_plugins : [
+          ]
+        }
+    }
+}
+
+40. request is like this:
+<HttpRequest 'http://localhost:8000/api/clients/C.1be17baa0aeb80b5/flows' [POST]>
+
+41. creation of args happen here:   def _GetArgsFromRequest(self, request, method_metadata, route_args):
+
+42. The rdf struct for args has the following fields:
+<TypeDescriptorSet for TypeDescriptorSet>
+ client_id: Client id.
+ flow: 
+ original_flow: 
+</TypeDescriptorSet>
+
+43. There is a fuckin #MYSTERY in here:
+    payload = json.loads(request.get_data(as_text=True) or "{}")::
+	{u'flow': {u'args': {u'binary': u'aff4:/config/python_hacks/linux/custom.py'}, u'runner_args': {u'flow_name': u'LaunchBinary', u'output_plugins': []}}}
+
+but request:
+<HttpRequest 'http://localhost:8000/api/clients/C.1be17baa0aeb80b5/flows' [POST]>
+
+
+44. #EXAMPLE::: router method metadata:
+name:CreateFlow
+doc:Start a new flow on a given client.
+args_type: <class 'grr_response_server.gui.api_plugins.flow.ApiCreateFlowArgs'> 
+result_type:<class 'grr_response_server.gui.api_plugins.flow.ApiFlow'>
+category: Flows
+http_methods: [(u'POST', u'/api/clients/<client_id>/flows', {'strip_root_types': False})]
+no_audit_log_required: False
+
+45. all available http_methods:
+[(u'POST', u'/api/clients/labels/add', {'strip_root_types': True})]
+[(u'POST', u'/api/clients/<client_id>/flows/<path:flow_id>/actions/cancel', {'strip_root_types': True})]
+[(u'POST', u'/api/users/me/approvals/client/<client_id>', {'strip_root_types': False})]
+[(u'POST', u'/api/cron-jobs', {'strip_root_types': False})]
+[(u'POST', u'/api/users/me/approvals/cron-job/<cron_job_id>', {'strip_root_types': False})]
+[(u'POST', u'/api/clients/<client_id>/flows', {'strip_root_types': False})]
+[(u'POST', u'/api/hunts', {'strip_root_types': False})]
+[(u'POST', u'/api/users/me/approvals/hunt/<hunt_id>', {'strip_root_types': False})]
+[(u'POST', u'/api/clients/<client_id>/vfs-refresh-operations', {'strip_root_types': True})]
+[(u'DELETE', u'/api/artifacts', {'strip_root_types': True})]
+[(u'DELETE', u'/api/cron-jobs/<cron_job_id>', {'strip_root_types': True})]
+[(u'DELETE', u'/api/hunts/<hunt_id>', {'strip_root_types': False})]
+[(u'DELETE', u'/api/users/me/notifications/pending/<timestamp>', {'strip_root_types': True})]
+[(u'POST', u'/api/cron-jobs/<cron_job_id>/actions/force-run', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>', {'strip_root_types': False})]
+[(u'GET', u'/api/users/<username>/approvals/client/<client_id>/<approval_id>', {'strip_root_types': False})]
+[(u'GET', u'/api/clients/<client_id>/load-stats/<metric>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/version-times', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/versions', {'strip_root_types': True})]
+[(u'GET', u'/api/config', {'strip_root_types': True})]
+[(u'GET', u'/api/config/<name>', {'strip_root_types': True})]
+[(u'GET', u'/api/cron-jobs/<cron_job_id>', {'strip_root_types': False})]
+[(u'GET', u'/api/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>', {'strip_root_types': False})]
+[(u'GET', u'/api/cron-jobs/<cron_job_id>/runs/<run_id>', {'strip_root_types': False})]
+[(u'GET', u'/api/clients/<client_id>/vfs-decoded-blob/<decoder_name>/<path:file_path>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/flows/<path:flow_id>/exported-results/<plugin_name>', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/exported-results/<plugin_name>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-blob/<path:file_path>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-decoders/<path:file_path>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-details/<path:file_path>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-download-command/<path:file_path>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-text/<path:file_path>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-version-times/<path:file_path>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/flows/<path:flow_id>', {'strip_root_types': False})]
+[(u'GET', u'/api/clients/<client_id>/flows/<path:flow_id>/results/files-archive', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/flows/<path:flow_id>/results/export-command', {'strip_root_types': True})]
+[(u'GET', u'/api/config/binaries/<type>/<path:path>', {'strip_root_types': True})]
+[(u'GET', u'/api/config/binaries-blobs/<type>/<path:path>', {'strip_root_types': True})]
+[(u'GET', u'/api/users/me', {'strip_root_types': False})]
+[(u'GET', u'/api/hunts/<hunt_id>', {'strip_root_types': False})]
+[(u'GET', u'/api/users/<username>/approvals/hunt/<hunt_id>/<approval_id>', {'strip_root_types': False})]
+[(u'GET', u'/api/hunts/<hunt_id>/client-completion-stats', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/context', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/results/clients/<client_id>/vfs-blob/<path:vfs_path>', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/results/files-archive', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/results/export-command', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/stats', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/actions/interrogate/<path:operation_id>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/last-ip', {'strip_root_types': True})]
+[(u'GET', u'/api/users/me/notifications/pending/count', {'strip_root_types': True})]
+[(u'GET', u'/api/reflection/rdfvalue/<type>', {'strip_root_types': False})]
+[(u'GET', u'/api/stats/reports/<name>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-update/<path:operation_id>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-files-archive/<path:file_path>', {'strip_root_types': True}), (u'GET', u'/api/clients/<client_id>/vfs-files-archive/', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-refresh-operations/<path:operation_id>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-timeline/<path:file_path>', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-timeline-csv/<path:file_path>', {'strip_root_types': True})]
+[(u'POST', u'/api/users/<username>/approvals/client/<client_id>/<approval_id>/actions/grant', {'strip_root_types': False})]
+[(u'POST', u'/api/users/<username>/approvals/cron-job/<cron_job_id>/<approval_id>/actions/grant', {'strip_root_types': False})]
+[(u'POST', u'/api/users/<username>/approvals/hunt/<hunt_id>/<approval_id>/actions/grant', {'strip_root_types': False})]
+[(u'POST', u'/api/clients/<client_id>/actions/interrogate', {'strip_root_types': True})]
+[(u'GET', u'/api/reflection/aff4/attributes', {'strip_root_types': True})]
+[(u'POST', u'/api/users/me/notifications', {'strip_root_types': True})]
+[(u'GET', u'/api/reflection/api-methods', {'strip_root_types': True})]
+[(u'GET', u'/api/users/approver-suggestions', {'strip_root_types': True})]
+[(u'GET', u'/api/artifacts', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/action-requests', {'strip_root_types': True})]
+[(u'GET', u'/api/users/me/approvals/client/<client_id>', {'strip_root_types': True}), (u'GET', u'/api/users/me/approvals/client', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/crashes', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/labels', {'strip_root_types': True})]
+[(u'GET', u'/api/users/me/approvals/cron-job', {'strip_root_types': True})]
+[(u'GET', u'/api/cron-jobs/<cron_job_id>/runs', {'strip_root_types': True})]
+[(u'GET', u'/api/cron-jobs', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/vfs-index/<path:file_path>', {'strip_root_types': True}), (u'GET', u'/api/clients/<client_id>/vfs-index/', {'strip_root_types': True})]
+[(u'GET', u'/api/flows/descriptors', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/flows/<path:flow_id>/log', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/flows/<path:flow_id>/output-plugins/<plugin_id>/errors', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/flows/<path:flow_id>/output-plugins/<plugin_id>/logs', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/flows/<path:flow_id>/output-plugins', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/flows/<path:flow_id>/requests', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/flows/<path:flow_id>/results', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/<client_id>/flows', {'strip_root_types': True})]
+[(u'GET', u'/api/config/binaries', {'strip_root_types': True})]
+[(u'GET', u'/api/users/me/approvals/hunt', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/clients/<client_status>', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/crashes', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/errors', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/log', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/output-plugins/<plugin_id>/errors', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/output-plugins/<plugin_id>/logs', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/output-plugins', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts/<hunt_id>/results', {'strip_root_types': True})]
+[(u'GET', u'/api/hunts', {'strip_root_types': True})]
+[(u'GET', u'/api/clients/kb-fields', {'strip_root_types': True})]
+[(u'GET', u'/api/reflection/file-encodings', {'strip_root_types': True})]
+[(u'GET', u'/api/output-plugins/all', {'strip_root_types': True})]
+[(u'GET', u'/api/users/me/notifications/pending', {'strip_root_types': True})]
+[(u'GET', u'/api/reflection/rdfvalue/all', {'strip_root_types': True})]
+[(u'GET', u'/api/stats/reports', {'strip_root_types': True})]
+[(u'PATCH', u'/api/cron-jobs/<cron_job_id>', {'strip_root_types': False})]
+[(u'PATCH', u'/api/hunts/<hunt_id>', {'strip_root_types': False})]
+[(u'POST', u'/api/clients/labels/remove', {'strip_root_types': True})]
+[(u'GET', u'/api/clients', {'strip_root_types': True})]
+[(u'POST', u'/api/users/me', {'strip_root_types': True})]
+[(u'POST', u'/api/clients/<client_id>/vfs-update', {'strip_root_types': True})]
+[(u'POST', u'/api/artifacts', {'strip_root_types': True})]
+
+46. routing map has the method called and the associated metadata with it; 
+
+47. note that     self._routing_maps_cache = utils.FastStore()
+
+48. all methods exists in ApiCallRouterStub in api_call_router:e.g.
+
+  @Category("Flows")
+  @ArgsType(api_flow.ApiCreateFlowArgs)
+  @ResultType(api_flow.ApiFlow)
+  @Http("POST", "/api/clients/<client_id>/flows", strip_root_types=False)
+  def CreateFlow(self, args, token=None):
+    """Start a new flow on a given client."""
+    raise NotImplementedError()
+
+49. All existent flows that are with categories [others exists are mentioned underneath]: (76 flows);; GET THEM FROM ApiListFlowDescriptorsHandler in api_pugins/flow.py
+ArtifactCollectorFlow
+ArtifactFilesDownloaderFlow
+CAEnroler
+CacheGrep
+CheckRunner
+ChromeHistory
+CleanCronJobs
+CleanHunts
+CleanInactiveClients
+ClientAlertHandlerFlow
+ClientArtifactCollector
+ClientFileFinder
+ClientStartupHandlerFlow
+ClientVfsMigrationFlow
+CollectRunKeyBinaries
+CreateAndRunGenericHuntFlow
+CreateGenericHuntFlow
+DeleteGRRTempFiles
+DiskVolumeInfo
+DumpACPITable
+DumpFlashImage
+Enroler
+ExecuteCommand
+ExecutePythonHack
+FetchBufferForSparseImage
+FileFinder
+FindFiles
+FingerprintFile
+FirefoxHistory
+FlowBase
+Foreman
+GRRFlow
+GRRHunt
+GRRVersionBreakDown
+GenericHunt
+GetClientStats
+GetClientStatsAuto
+GetFile
+GetMBR
+Glob
+Interrogate
+InterrogateClientsCronFlow
+KeepAlive
+Kill
+KnowledgeBaseInitializationFlow
+LastAccessStats
+LaunchBinary
+ListDirectory
+ListProcesses
+ListVolumeShadowCopies
+MakeNewAFF4SparseImage
+MultiGetFile
+NannyMessageHandlerFlow
+Netstat
+OSBreakDown
+OnlineNotification
+OsqueryFlow
+PlistValueFilter
+ProcessHuntResultCollectionsCronFlow
+PurgeClientStats
+RecursiveListDirectory
+RegistryFinder
+SampleHunt
+SendFile
+SystemRootSystemDriveFallbackFlow
+TransferStore
+Uninstall
+UpdateClient
+UpdateConfiguration
+UpdateSparseImageChunks
+UpdateVFSFile
+VariableGenericHunt
+WellKnownFlow
+WindowsAllUsersProfileFallbackFlow
+YaraDumpProcessMemory
+YaraProcessScan
+
+50. The classes for such names are the following:
+<class 'abc.ArtifactCollectorFlow'>
+<class 'abc.ArtifactFilesDownloaderFlow'>
+<class 'abc.CAEnroler'>
+<class 'abc.CacheGrep'>
+<class 'abc.CheckRunner'>
+<class 'abc.ChromeHistory'>
+<class 'grr_response_server.flows.cron.data_retention.CleanCronJobs'>
+<class 'grr_response_server.flows.cron.data_retention.CleanHunts'>
+<class 'grr_response_server.flows.cron.data_retention.CleanInactiveClients'>
+<class 'grr_response_server.flows.general.administrative.ClientAlertHandlerFlow'>
+<class 'abc.ClientArtifactCollector'>
+<class 'abc.ClientFileFinder'>
+<class 'grr_response_server.flows.general.administrative.ClientStartupHandlerFlow'>
+<class 'grr_response_server.flows.general.data_migration.ClientVfsMigrationFlow'>
+<class 'abc.CollectRunKeyBinaries'>
+<class 'grr_response_server.hunts.standard.CreateAndRunGenericHuntFlow'>
+<class 'grr_response_server.hunts.standard.CreateGenericHuntFlow'>
+<class 'abc.DeleteGRRTempFiles'>
+<class 'abc.DiskVolumeInfo'>
+<class 'abc.DumpACPITable'>
+<class 'abc.DumpFlashImage'>
+<class 'grr_response_server.flows.general.ca_enroller.Enroler'>
+<class 'abc.ExecuteCommand'>
+<class 'abc.ExecutePythonHack'>
+<class 'abc.FetchBufferForSparseImage'>
+<class 'abc.FileFinder'>
+<class 'abc.FindFiles'>
+<class 'abc.FingerprintFile'>
+<class 'abc.FirefoxHistory'>
+<class 'grr_response_server.flow.FlowBase'>
+<class 'grr_response_server.flows.general.administrative.Foreman'>
+<class 'grr_response_server.flow.GRRFlow'>
+<class 'grr_response_server.hunts.implementation.GRRHunt'>
+<class 'grr_response_server.flows.cron.system.GRRVersionBreakDown'>
+<class 'grr_response_server.hunts.standard.GenericHunt'>
+<class 'abc.GetClientStats'>
+<class 'grr_response_server.flows.general.administrative.GetClientStatsAuto'>
+<class 'abc.GetFile'>
+<class 'abc.GetMBR'>
+<class 'abc.Glob'>
+<class 'abc.Interrogate'>
+<class 'grr_response_server.flows.cron.system.InterrogateClientsCronFlow'>
+<class 'abc.KeepAlive'>
+<class 'abc.Kill'>
+<class 'abc.KnowledgeBaseInitializationFlow'>
+<class 'grr_response_server.flows.cron.system.LastAccessStats'>
+<class 'abc.LaunchBinary'>
+<class 'abc.ListDirectory'>
+<class 'abc.ListProcesses'>
+<class 'grr_response_server.flows.general.windows_vsc.ListVolumeShadowCopies'>
+<class 'grr_response_server.flows.general.filesystem.MakeNewAFF4SparseImage'>
+<class 'abc.MultiGetFile'>
+<class 'grr_response_server.flows.general.administrative.NannyMessageHandlerFlow'>
+<class 'abc.Netstat'>
+<class 'grr_response_server.flows.cron.system.OSBreakDown'>
+<class 'abc.OnlineNotification'>
+<class 'abc.OsqueryFlow'>
+::ffff:127.0.0.1 - - [02/Mar/2019 21:23:51] "HEAD /api/clients/C.1be17baa0aeb80b5/flows HTTP/1.1" 200 0
+<class 'grr_response_server.flows.general.filetypes.PlistValueFilter'>
+<class 'abc.ProcessHuntResultCollectionsCronFlow'>
+<class 'grr_response_server.flows.cron.system.PurgeClientStats'>
+<class 'abc.RecursiveListDirectory'>
+<class 'abc.RegistryFinder'>
+<class 'grr_response_server.hunts.standard.SampleHunt'>
+<class 'abc.SendFile'>
+<class 'abc.SystemRootSystemDriveFallbackFlow'>
+<class 'grr_response_server.flows.general.transfer.TransferStore'>
+<class 'abc.Uninstall'>
+<class 'abc.UpdateClient'>
+<class 'abc.UpdateConfiguration'>
+<class 'abc.UpdateSparseImageChunks'>
+<class 'grr_response_server.aff4_objects.aff4_grr.UpdateVFSFile'>
+<class 'grr_response_server.hunts.standard.VariableGenericHunt'>
+<class 'grr_response_server.flow.WellKnownFlow'>
+<class 'abc.WindowsAllUsersProfileFallbackFlow'>
+<class 'abc.YaraDumpProcessMemory'>
+<class 'abc.YaraProcessScan'>
+
+
+some flows are with no categoru:
+<class 'grr_response_server.flows.cron.data_retention.CleanCronJobs'>
+<class 'grr_response_server.flows.cron.data_retention.CleanHunts'>
+<class 'grr_response_server.flows.cron.data_retention.CleanInactiveClients'>
+<class 'grr_response_server.flows.general.administrative.ClientAlertHandlerFlow'>
+<class 'grr_response_server.flows.general.administrative.ClientStartupHandlerFlow'>
+<class 'grr_response_server.hunts.standard.CreateAndRunGenericHuntFlow'>
+<class 'grr_response_server.hunts.standard.CreateGenericHuntFlow'>
+<class 'grr_response_server.flows.general.ca_enroller.Enroler'>
+<class 'abc.ExecuteCommand'>
+<class 'grr_response_server.flow.FlowBase'>
+<class 'grr_response_server.flows.general.administrative.Foreman'>
+<class 'grr_response_server.flow.GRRFlow'>
+<class 'grr_response_server.hunts.implementation.GRRHunt'>
+<class 'grr_response_server.flows.cron.system.GRRVersionBreakDown'>
+<class 'grr_response_server.hunts.standard.GenericHunt'>
+<class 'grr_response_server.flows.general.administrative.GetClientStatsAuto'>
+<class 'grr_response_server.flows.cron.system.InterrogateClientsCronFlow'>
+<class 'grr_response_server.flows.cron.system.LastAccessStats'>
+<class 'abc.MultiGetFile'>
+<class 'grr_response_server.flows.general.administrative.NannyMessageHandlerFlow'>
+<class 'grr_response_server.flows.cron.system.OSBreakDown'>
+<class 'abc.ProcessHuntResultCollectionsCronFlow'>
+<class 'grr_response_server.flows.cron.system.PurgeClientStats'>
+<class 'grr_response_server.hunts.standard.SampleHunt'>
+<class 'abc.SystemRootSystemDriveFallbackFlow'>
+<class 'grr_response_server.flows.general.transfer.TransferStore'>
+<class 'abc.UpdateConfiguration'>
+<class 'grr_response_server.aff4_objects.aff4_grr.UpdateVFSFile'>
+<class 'grr_response_server.hunts.standard.VariableGenericHunt'>
+<class 'grr_response_server.flow.WellKnownFlow'>
+<class 'abc.WindowsAllUsersProfileFallbackFlow'>
+
+51. flow descriptors and all fields of it:
+<class 'abc.ArtifactCollectorFlow'>
+message ApiFlowDescriptor {
+ args_type : u'ArtifactCollectorFlowArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Collectors'
+ default_args :   <ArtifactCollectorFlowArgs('message ArtifactCollectorFlowArgs {\n}')>
+ doc : u'Flow that takes a list of artifacts and collects them.\n\n  This flow is the core of the Artifact implementation for GRR. Artifacts are\n  defined using a standardized data format that includes what to collect and\n  how to process the things collected. This flow takes that data driven format\n  and makes it useful.\n\n  The core functionality of Artifacts is split into ArtifactSources and\n  Processors.\n\n  An Artifact defines a set of ArtifactSources that are used to retrieve data\n  from the client. These can specify collection of files, registry keys, command\n  output and others. The first part of this flow "Collect" handles running those\n  collections by issuing GRR flows and client actions.\n\n  The results of those are then collected and GRR searches for Processors that\n  know how to process the output of the ArtifactSources. The Processors all\n  inherit from the Parser class, and each Parser specifies which Artifacts it\n  knows how to process.\n\n  So this flow hands off the collected rdfvalue results to the Processors which\n  then return modified or different rdfvalues. These final results are then\n  either:\n  1. Sent to the calling flow.\n  2. Written to a collection.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="ArtifactCollectorFlow", artifact_list=artifact_list, use_tsk=use_tsk, split_output_by_artifact=split_output_by_artifact, knowledge_base=knowledge_base, error_on_no_results=error_on_no_results, apply_parsers=apply_parsers, max_file_size=max_file_size, dependencies=dependencies, ignore_interpolation_errors=ignore_interpolation_errors, recollect_knowledge_base=recollect_knowledge_base)\n\n  Args:\n    apply_parsers\n      description: If True, apply any relevant parser to the collected data. If False, return the raw collected data e.g Files or Registry Keys.\n      type: RDFBool\n      default: 1\n\n    artifact_list\n      description: A list of Artifact class names.\n      type: \n      default: None\n\n    dependencies\n      description: Specifies how dependencies should be handled.\n      type: EnumNamedValue\n      default: USE_CACHED\n\n    error_on_no_results\n      description: If True, an artifact returning no results will raise a hard error. This is useful where you always expect results.\n      type: RDFBool\n      default: 0\n\n    ignore_interpolation_errors\n      description: If true, don\'t die if %%users.homedir%% and similar fail to expand. It\'s common on windows for some user attributes to be missing if users have never logged in. Enable this when you have multiple artifacts or paths and want to report partial results.\n      type: RDFBool\n      default: 0\n\n    knowledge_base\n      description: An optional knowledge base to use, if not specified we retrieve one from the client object.\n      type: KnowledgeBase\n      default: None\n\n    max_file_size\n      description: The maximum size of files we will download in bytes, 500MB by default.\n      type: ByteSize\n      default: 500000000\n\n    recollect_knowledge_base\n      description: Whether the dependencies should be collected as well or the interrogation flow is used.\n      type: RDFBool\n      default: 0\n\n    split_output_by_artifact\n      description: If True, use output as a directory and write a separate collection for each artifact collected.\n      type: RDFBool\n      default: 0\n\n    use_tsk\n      description: Whether raw filesystem access should be used.\n      type: RDFBool\n      default: 0\n'
+ name : u'ArtifactCollectorFlow'
+}
+<class 'abc.ArtifactFilesDownloaderFlow'>
+message ApiFlowDescriptor {
+ args_type : u'ArtifactFilesDownloaderFlowArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Collectors'
+ default_args :   <ArtifactFilesDownloaderFlowArgs('message ArtifactFilesDownloaderFlowArgs {\n}')>
+ doc : u'Flow that downloads files referenced by collected artifacts.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="ArtifactFilesDownloaderFlow", artifact_list=artifact_list, use_tsk=use_tsk, max_file_size=max_file_size)\n\n  Args:\n    artifact_list\n      description: A list of Artifact class names.\n      type: \n      default: None\n\n    max_file_size\n      description: The maximum size of files we will download in bytes, 500MB by default.\n      type: ByteSize\n      default: 500000000\n\n    use_tsk\n      description: Whether raw filesystem access should be used.\n      type: RDFBool\n      default: 0\n'
+ name : u'ArtifactFilesDownloaderFlow'
+}
+<class 'abc.CAEnroler'>
+<class 'abc.CacheGrep'>
+message ApiFlowDescriptor {
+ args_type : u'CacheGrepArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Browser'
+ default_args :   <CacheGrepArgs('message CacheGrepArgs {\n}')>
+ doc : u'Grep the browser profile directories for a regex.\n\n  This will check Chrome, Firefox and Internet Explorer profile directories.\n  Note that for each directory we get a maximum of 50 hits returned.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="CacheGrep", grep_users=grep_users, pathtype=pathtype, data_regex=data_regex, check_chrome=check_chrome, check_firefox=check_firefox, check_ie=check_ie)\n\n  Args:\n    check_chrome\n      description: Check Chrome\n      type: RDFBool\n      default: 1\n\n    check_firefox\n      description: Check Firefox\n      type: RDFBool\n      default: 1\n\n    check_ie\n      description: Check Internet Explorer (Not implemented yet)\n      type: RDFBool\n      default: 1\n\n    data_regex\n      description: A regular expression to search for.\n      type: RegularExpression\n      default: None\n\n    grep_users\n      description: A list of users to check. Default all users on the system.\n      type: \n      default: None\n\n    pathtype\n      description: Type of path access to use.\n      type: EnumNamedValue\n      default: OS\n'
+ name : u'CacheGrep'
+}
+<class 'abc.CheckRunner'>
+message ApiFlowDescriptor {
+ args_type : u'CheckFlowArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Checks'
+ default_args :   <CheckFlowArgs('message CheckFlowArgs {\n}')>
+ doc : u'This flow runs checks on a host.\n\n  CheckRunner:\n  - Identifies what checks should be run for a host.\n  - Identifies the artifacts that need to be collected to perform those checks.\n  - Orchestrates collection of the host data.\n  - Routes host data to the relevant checks.\n  - Returns check data ready for reporting.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="CheckRunner", only_os=only_os, only_cpe=only_cpe, only_label=only_label, max_findings=max_findings, restrict_checks=restrict_checks)\n\n  Args:\n    max_findings\n      description: Summarize checks with more than N individual findings.\n      type: \n      default: None\n\n    only_cpe\n      description: Limit checks to hosts with cpe strings.\n      type: \n      default: None\n\n    only_label\n      description: Lim::ffff:127.0.0.1 - - [02/Mar/2019 21:27:03] "HEAD /api/clients/C.1be17baa0aeb80b5/flows HTTP/1.1" 200 0
+it checks to hosts with label strings.\n      type: \n      default: None\n\n    only_os\n      description: Limit checks to hosts of OS type(s) [Linux|OSX|Windows]\n      type: \n      default: None\n\n    restrict_checks\n      description: Only run checks with the specified check_ids.\n      type: \n      default: None\n'
+ friendly_name : u'Run Checks'
+ name : u'CheckRunner'
+}
+<class 'abc.ChromeHistory'>
+message ApiFlowDescriptor {
+ args_type : u'ChromeHistoryArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Browser'
+ default_args :   <ChromeHistoryArgs('message ChromeHistoryArgs {\n}')>
+ doc : u'Retrieve and analyze the chrome history for a machine.\n\n  Default directories as per:\n    http://www.chromium.org/user-experience/user-data-directory\n\n  Windows XP\n  Google Chrome:\n  c:\\\\Documents and Settings\\\\<username>\\\\Local Settings\\\\Application Data\\\\\n    Google\\\\Chrome\\\\User Data\\\\Default\n\n  Windows 7 or Vista\n  c:\\\\Users\\\\<username>\\\\AppData\\\\Local\\\\Google\\\\Chrome\\\\User Data\\\\Default\n\n  Mac OS X\n  /Users/<user>/Library/Application Support/Google/Chrome/Default\n\n  Linux\n  /home/<user>/.config/google-chrome/Default\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="ChromeHistory", pathtype=pathtype, get_archive=get_archive, username=username, history_path=history_path)\n\n  Args:\n    get_archive\n      description: Should we get Archived History as well (3 months old).\n      type: RDFBool\n      default: 0\n\n    history_path\n      description: Path to a profile directory that contains a History file.\n      type: RDFString\n      default: \n\n    pathtype\n      description: Type of path access to use.\n      type: EnumNamedValue\n      default: OS\n\n    username\n      description: The user to get Chrome history for. If history_path is not set this will be used to guess the path to the history files. Can be in form DOMAIN\\user.\n      type: RDFString\n      default: \n'
+ name : u'ChromeHistory'
+}
+<class 'grr_response_server.flows.cron.data_retention.CleanCronJobs'>
+<class 'grr_response_server.flows.cron.data_retention.CleanHunts'>
+<class 'grr_response_server.flows.cron.data_retention.CleanInactiveClients'>
+<class 'grr_response_server.flows.general.administrative.ClientAlertHandlerFlow'>
+<class 'abc.ClientArtifactCollector'>
+message ApiFlowDescriptor {
+ args_type : u'ArtifactCollectorFlowArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Collectors'
+ default_args :   <ArtifactCollectorFlowArgs('message ArtifactCollectorFlowArgs {\n}')>
+ doc : u'A client side artifact collector.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="ClientArtifactCollector", artifact_list=artifact_list, use_tsk=use_tsk, split_output_by_artifact=split_output_by_artifact, knowledge_base=knowledge_base, error_on_no_results=error_on_no_results, apply_parsers=apply_parsers, max_file_size=max_file_size, dependencies=dependencies, ignore_interpolation_errors=ignore_interpolation_errors, recollect_knowledge_base=recollect_knowledge_base)\n\n  Args:\n    apply_parsers\n      description: If True, apply any relevant parser to the collected data. If False, return the raw collected data e.g Files or Registry Keys.\n      type: RDFBool\n      default: 1\n\n    artifact_list\n      description: A list of Artifact class names.\n      type: \n      default: None\n\n    dependencies\n      description: Specifies how dependencies should be handled.\n      type: EnumNamedValue\n      default: USE_CACHED\n\n    error_on_no_results\n      description: If True, an artifact returning no results will raise a hard error. This is useful where you always expect results.\n      type: RDFBool\n      default: 0\n\n    ignore_interpolation_errors\n      description: If true, don\'t die if %%users.homedir%% and similar fail to expand. It\'s common on windows for some user attributes to be missing if users have never logged in. Enable this when you have multiple artifacts or paths and want to report partial results.\n      type: RDFBool\n      default: 0\n\n    knowledge_base\n      description: An optional knowledge base to use, if not specified we retrieve one from the client object.\n      type: KnowledgeBase\n      default: None\n\n    max_file_size\n      description: The maximum size of files we will download in bytes, 500MB by default.\n      type: ByteSize\n      default: 500000000\n\n    recollect_knowledge_base\n      description: Whether the dependencies should be collected as well or the interrogation flow is used.\n      type: RDFBool\n      default: 0\n\n    split_output_by_artifact\n      description: If True, use output as a directory and write a separate collection for each artifact collected.\n      type: RDFBool\n      default: 0\n\n    use_tsk\n      description: Whether raw filesystem access should be used.\n      type: RDFBool\n      default: 0\n'
+ name : u'ClientArtifactCollector'
+}
+<class 'abc.ClientFileFinder'>
+message ApiFlowDescriptor {
+ args_type : u'FileFinderArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Filesystem'
+ default_args :   <FileFinderArgs('message FileFinderArgs {\n}')>
+ doc : u'A client side file finder flow.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="ClientFileFinder", paths=paths, pathtype=pathtype, conditions=conditions, action=action, process_non_regular_files=process_non_regular_files, follow_links=follow_links, xdev=xdev)\n\n  Args:\n    action\n      description: \n      type: FileFinderAction\n      default: None\n\n    conditions\n      description: These conditions will be applied to all files that match the path arguments.\n      type: \n      default: None\n\n    follow_links\n      description: Should symbolic links be followed in recursive directory listings.\n      type: RDFBool\n      default: 0\n\n    paths\n      description: A path to glob that can contain %% expansions.\n      type: \n      default: None\n\n    pathtype\n      description: Path type to glob in.\n      type: EnumNamedValue\n      default: OS\n\n    process_non_regular_files\n      description: Look both into regular files and non-regular files (devices, named pipes, sockets). NOTE: This is very dangerous and should be used with care.\n      type: RDFBool\n      default: 0\n\n    xdev\n      description: Behavior when ecountering device boundaries while doing recursive searches.\n      type: EnumNamedValue\n      default: LOCAL\n'
+ friendly_name : u'Client Side File Finder'
+ name : u'ClientFileFinder'
+}
+<class 'grr_response_server.flows.general.administrative.ClientStartupHandlerFlow'>
+<class 'grr_response_server.flows.general.data_migration.ClientVfsMigrationFlow'>
+message ApiFlowDescriptor {
+ args_type : u'EmptyFlowArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Administrative'
+ default_args :   <EmptyFlowArgs('message EmptyFlowArgs {\n}')>
+ doc : u'None\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="ClientVfsMigrationFlow", )\n\n  Args: None'
+ name : u'ClientVfsMigrationFlow'
+}
+<class 'abc.CollectRunKeyBinaries'>
+message ApiFlowDescriptor {
+ args_type : u'EmptyFlowArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Registry'
+ default_args :   <EmptyFlowArgs('message EmptyFlowArgs {\n}')>
+ doc : u'Collect the binaries used by Run and RunOnce keys on the system.\n\n  We use the RunKeys artifact to get RunKey command strings for all users and\n  System. This flow guesses file paths from the strings, expands any\n  windows system environment variables, and attempts to retrieve the files.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="CollectRunKeyBinaries", )\n\n  Args: None'
+ name : u'CollectRunKeyBinaries'
+}
+<class 'grr_response_server.hunts.standard.CreateAndRunGenericHuntFlow'>
+<class 'grr_response_server.hunts.standard.CreateGenericHuntFlow'>
+<class 'abc.DeleteGRRTempFiles'>
+message ApiFlowDescriptor {
+ args_type : u'DeleteGRRTempFilesArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Administrative'
+ default_args :   <DeleteGRRTempFilesArgs('message DeleteGRRTempFilesArgs {\n}')>
+ doc : u'Delete all the GRR temp files in path.\n\n  If path is a directory, look in the top level for filenames beginning with\n  Client.tempfile_prefix, and delete them.\n\n  If path is a regular file and starts with Client.tempfile_prefix, delete it.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="DeleteGRRTempFiles", pathspec=pathspec)\n\n  Args:\n    pathspec\n      description: The pathspec target for deletion.If path is a directory, look in the top level for filenames beginning with Client.tempfile_prefix, and delete them. If path is a regular file and starts with Client.tempfile_prefix, delete it.\n      type: PathSpec\n      default: None\n'
+ name : u'DeleteGRRTempFiles'
+}
+<class 'abc.DiskVolumeInfo'>
+message ApiFlowDescriptor {
+ args_type : u'DiskVolumeInfoArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Filesystem'
+ default_args :   <DiskVolumeInfoArgs('message DiskVolumeInfoArgs {\n}')>
+ doc : u'Get disk volume info for a given path.\n\n  On linux and OS X we call StatFS on each path and return the results. For\n  windows we collect all the volume information and filter it using the drive\n  letters in the supplied path list.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="DiskVolumeInfo", path_list=path_list, pathtype=pathtype)\n\n  Args:\n    path_list\n      description: List of paths.\n      type: \n      default: None\n\n    pathtype\n      description: Type of path. Only OS is currently supported.\n      type: EnumNamedValue\n      default: OS\n'
+ name : u'DiskVolumeInfo'
+}
+<class 'abc.DumpACPITable'>
+message ApiFlowDescriptor {
+ args_type : u'DumpACPITableArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Collectors'
+ default_args :   <DumpACPITableArgs('message DumpACPITableArgs {\n}')>
+ doc : u'Flow to retrieve ACPI tables.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="DumpACPITable", logging=logging, table_signature_list=table_signature_list)\n\n  Args:\n    logging\n      description: If the logging is set to true, the client sends log, including Chipsec\'s log.\n      type: RDFBool\n      default: 0\n\n    table_signature_list\n      description: Signature of ACPI tables to be dumped.\n      type: \n      default: None\n'
+ name : u'DumpACPITable'
+}
+<class 'abc.DumpFlashImage'>
+message ApiFlowDescriptor {
+ args_type : u'DumpFlashImageArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Collectors'
+ default_args :   <DumpFlashImageArgs('message DumpFlashImageArgs {\n}')>
+ doc : u'Dump Flash image (BIOS).\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="DumpFlashImage", log_level=log_level, chunk_size=chunk_size, notify_syslog=notify_syslog)\n\n  Args:\n    chunk_size\n      description: A heartbeat will be emitted every chunk_size.This could be reduced in case the process times out.\n      type: RDFInteger\n      default: 65536\n\n    log_level\n      description: Set the log level. If set, the log returned will include additional information reported by Chipsec.\n      type: RDFInteger\n      default: 0\n\n    notify_syslog\n      description: If true, a message will be written by the client to the syslog before running the action. This can be used for debugging in case the client crashes during the image dumping process.\n      type: RDFBool\n      default: 0\n'
+ name : u'DumpFlashImage'
+}
+<class 'grr_response_server.flows.general.ca_enroller.Enroler'>
+<class 'abc.ExecuteCommand'>
+<class 'abc.ExecutePythonHack'>
+message ApiFlowDescriptor {
+ args_type : u'ExecutePythonHackArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Administrative'
+ default_args :   <ExecutePythonHackArgs('message ExecutePythonHackArgs {\n}')>
+ doc : u'Execute a signed python hack on a client.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="ExecutePythonHack", hack_name=hack_name, py_args=py_args)\n\n  Args:\n    hack_name\n      description: Relative path to the hack to execute.\n      type: RDFString\n      default: \n\n    py_args\n      description: Python Hack Arguments.\n      type: Dict\n      default: None\n'
+ name : u'ExecutePythonHack'
+}
+<class 'abc.FetchBufferForSparseImage'>
+message ApiFlowDescriptor {
+ args_type : u'FetchBufferForSparseImageArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Filesystem'
+ default_args :   <FetchBufferForSparseImageArgs('message FetchBufferForSparseImageArgs {\n}')>
+ doc : u'Reads data from a client-side file, specified by a length and offset.\n\n  This data is written to an AFF4SparseImage object. Note that\n  more data than is requested may be read since we align reads to chunks.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="FetchBufferForSparseImage", file_urn=file_urn, length=length, offset=offset)\n\n  Args:\n    file_urn\n      description: The URN of the sparse image to update\n      type: RDFURN\n      default: None\n\n    length\n      description: \n      type: RDFInteger\n      default: 0\n\n    offset\n      description: \n      type: RDFInteger\n      default: 0\n'
+ name : u'FetchBufferForSparseImage'
+}
+<class 'abc.FileFinder'>
+message ApiFlowDescriptor {
+ args_type : u'FileFinderArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Filesystem'
+ default_args :   <FileFinderArgs('message FileFinderArgs {\n}')>
+ doc : u'This flow looks for files matching given criteria and acts on them.\n\n  FileFinder searches for files that match glob expressions.  The "action"\n  (e.g. Download) is applied to files that match all given "conditions".\n  Matches are then written to the results collection. If there are no\n  "conditions" specified, "action" is just applied to all found files.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="FileFinder", paths=paths, pathtype=pathtype, conditions=conditions, action=action, process_non_regular_files=process_non_regular_files, follow_links=follow_links, xdev=xdev)\n\n  Args:\n    action\n      description: \n      type: FileFinderAction\n      default: None\n\n    conditions\n      description: These conditions will be applied to all files that match the path arguments.\n      type: \n      default: None\n\n    follow_links\n      description: Should symbolic links be followed in recursive directory listings.\n      type: RDFBool\n      default: 0\n\n    paths\n      description: A path to glob that can contain %% expansions.\n      type: \n      default: None\n\n    pathtype\n      description: Path type to glob in.\n      type: EnumNamedValue\n      default: OS\n\n    process_non_regular_files\n      description: Look both into regular files and non-regular files (devices, named pipes, sockets). NOTE: This is very dangerous and should be used with care.\n      type: RDFBool\n      default: 0\n\n    xdev\n      description: Behavior when ecountering device boundaries while doing recursive searches.\n      type: EnumNamedValue\n      default: LOCAL\n'
+ friendly_name : u'File Finder'
+ name : u'FileFinder'
+}
+<class 'abc.FindFiles'>
+message ApiFlowDescriptor {
+ args_type : u'FindFilesArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Filesystem'
+ default_args :   <FindFilesArgs('message FindFilesArgs {\n}')>
+ doc : u'Find files on the client.\n\n    The logic is:\n    - Find files under "Path"\n    - Filter for files with os.path.basename matching "Path Regular Expression"\n    - Filter for files with sizes between min and max limits\n    - Filter for files that contain "Data Regular Expression" in the first 1MB\n        of file data\n    - Return a StatEntry rdfvalue for each of the results\n\n    Path and data regexes, and file size limits are optional. Don"t encode path\n    information in the regex.  See correct usage below.\n\n    Example:\n\n    Path="/usr/local"\n    Path Regular Expression="admin"\n\n    Match: "/usr/local/bin/admin"      (file)\n    Match: "/usr/local/admin"          (directory)\n    No Match: "/usr/admin/local/blah"\n\n    The result from this flow is a list of StatEntry objects, one for\n    each file matching the criteria. Matching files will not be\n    downloaded by this flow, only the metadata of the file is fetched.\n\n  Returns to parent flow:\n    rdf_client_fs.StatEntry objects for each found file.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="FindFiles", findspec=findspec)\n\n  Args:\n    findspec\n      description: A find operation specification.\n      type: FindSpec\n      default: None\n'
+ friendly_name : u'Find Files'
+ name : u'FindFiles'
+}
+<class 'abc.FingerprintFile'>
+message ApiFlowDescriptor {
+ args_type : u'FingerprintFileArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Filesystem'
+ default_args :   <FingerprintFileArgs('message FingerprintFileArgs {\n}')>
+ doc : u'Retrieve all fingerprints of a file.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="FingerprintFile", pathspec=pathspec)\n\n  Args:\n    pathspec\n      description: The file path to fingerprint.\n      type: PathSpec\n      default: None\n'
+ name : u'FingerprintFile'
+}
+<class 'abc.FirefoxHistory'>
+message ApiFlowDescriptor {
+ args_type : u'FirefoxHistoryArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Browser'
+ default_args :   <FirefoxHistoryArgs('message FirefoxHistoryArgs {\n}')>
+ doc : u'Retrieve and analyze the Firefox history for a machine.\n\n  Default directories as per:\n    http://www.forensicswiki.org/wiki/Mozilla_Firefox_3_History_File_Format\n\n  Windows XP\n    C:\\\\Documents and Settings\\\\<username>\\\\Application Data\\\\Mozilla\\\\\n      Firefox\\\\Profiles\\\\<profile folder>\\\\places.sqlite\n\n  Windows Vista\n    C:\\\\Users\\\\<user>\\\\AppData\\\\Roaming\\\\Mozilla\\\\Firefox\\\\Profiles\\\\\n      <profile folder>\\\\places.sqlite\n\n  GNU/Linux\n    /home/<user>/.mozilla/firefox/<profile folder>/places.sqlite\n\n  Mac OS X\n    /Users/<user>/Library/Application Support/Firefox/Profiles/\n      <profile folder>/places.sqlite\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="FirefoxHistory", pathtype=pathtype, get_archive=get_archive, username=username, history_path=history_path)\n\n  Args:\n    get_archive\n      description: Should we get Archived History as well (3 months old).\n      type: RDFBool\n      default: 0\n\n    history_path\n      description: Path to a profile directory that contains a History file.\n      type: RDFString\n      default: \n\n    pathtype\n      description: Type of path access to use.\n      type: EnumNamedValue\n      default: OS\n\n    username\n      description: The user to get history for. If history_path is not set this will be used to guess the path to the history files. Can be in form DOMAIN\\user.\n      type: RDFString\n      default: \n'
+ name : u'FirefoxHistory'
+}
+<class 'grr_response_server.flow.FlowBase'>
+<class 'grr_response_server.flows.general.administrative.Foreman'>
+<class 'grr_response_server.flow.GRRFlow'>
+<class 'grr_response_server.hunts.implementation.GRRHunt'>
+<class 'grr_response_server.flows.cron.system.GRRVersionBreakDown'>
+<class 'grr_response_server.hunts.standard.GenericHunt'>
+<class 'abc.GetClientStats'>
+message ApiFlowDescriptor {
+ args_type : u'EmptyFlowArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Administrative'
+ default_args :   <EmptyFlowArgs('message EmptyFlowArgs {\n}')>
+ doc : u'This flow retrieves information about the GRR client process.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="GetClientStats", )\n\n  Args: None'
+ name : u'GetClientStats'
+}
+<class 'grr_response_server.flows.general.administrative.GetClientStatsAuto'>
+<class 'abc.GetFile'>
+message ApiFlowDescriptor {
+ args_type : u'GetFileArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Filesystem'
+ default_args :   <GetFileArgs('message GetFileArgs {\n pathspec :   message PathSpec {\n     pathtype : OS\n    }\n}')>
+ doc : u'An efficient file transfer mechanism (deprecated, use MultiGetFile).\n\n  This flow is deprecated in favor of MultiGetFile, but kept for now for use by\n  MemoryCollector since the buffer hashing performed by MultiGetFile is\n  pointless for memory acquisition.\n\n  GetFile can also retrieve content from device files that report a size of 0 in\n  stat when read_length is specified.\n\n  Returns to parent flow:\n    A PathSpec.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="GetFile", pathspec=pathspec, read_length=read_length, ignore_stat_failure=ignore_stat_failure)\n\n  Args:\n    ignore_stat_failure\n      description: Ignore stat failures and try to read anyway. Disable for windows devices.\n      type: RDFBool\n      default: 0\n\n    pathspec\n      description: The pathspec for the file to retrieve.\n      type: PathSpec\n      default: None\n\n    read_length\n      description: The amount of data to read from the file. If 0 we use the value from a stat call.\n      type: RDFInteger\n      default: 0\n'
+ name : u'GetFile'
+}
+<class 'abc.GetMBR'>
+message ApiFlowDescriptor {
+ args_type : u'GetMBRArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Filesystem'
+ default_args :   <GetMBRArgs('message GetMBRArgs {\n}')>
+ doc : u'A flow to retrieve the MBR.\n\n  Returns to parent flow:\n    The retrieved MBR.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="GetMBR", length=length)\n\n  Args:\n    length\n      description: The length of the MBR buffer to read.\n      type: RDFInteger\n      default: 4096\n'
+ name : u'GetMBR'
+}
+<class 'abc.Glob'>
+message ApiFlowDescriptor {
+ args_type : u'GlobArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Filesystem'
+ default_args :   <GlobArgs('message GlobArgs {\n}')>
+ doc : u'Glob the filesystem for patterns.\n\n  Returns:\n    StatEntry messages, one for each matching file.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="Glob", paths=paths, pathtype=pathtype, root_path=root_path, process_non_regular_files=process_non_regular_files)\n\n  Args:\n    paths\n      description: A list of paths to glob that supports: ** path recursion, * wildcards and %% expansions.\n      type: \n      default: None\n\n    pathtype\n      description: Type of access to glob in.\n      type: EnumNamedValue\n      default: OS\n\n    process_non_regular_files\n      description: Work with all kinds of files - not only with regular ones.NOTE: This is very dangerous and should be used with care, see MemoryCollector as an example.\n      type: RDFBool\n      default: 0\n\n    root_path\n      description: The root path to begin the glob.  Users should almost never need to change this. root_path.pathtype is unused in favor of pathtype to allow it to be modified by users.\n      type: PathSpec\n      default: None\n'
+ name : u'Glob'
+}
+<class 'abc.Interrogate'>
+message ApiFlowDescriptor {
+ args_type : u'InterrogateArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Administrative'
+ default_args :   <InterrogateArgs('message InterrogateArgs {\n}')>
+ doc : u'Interrogate various things about the host.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="Interrogate", lightweight=lightweight)\n\n  Args:\n    lightweight\n      description: Perform a light weight version of the interrogate.\n      type: RDFBool\n      default: 1\n'
+ name : u'Interrogate'
+}
+<class 'grr_response_server.flows.cron.system.InterrogateClientsCronFlow'>
+<class 'abc.KeepAlive'>
+message ApiFlowDescriptor {
+ args_type : u'KeepAliveArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Administrative'
+ default_args :   <KeepAliveArgs('message KeepAliveArgs {\n}')>
+ doc : u'Requests that the clients stays alive for a period of time.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="KeepAlive", duration=duration)\n\n  Args:\n    duration\n      description: Until when should the client stay in the fast poll mode.\n      type: Duration\n      default: 3600\n'
+ name : u'KeepAlive'
+}
+<class 'abc.Kill'>
+message ApiFlowDescriptor {
+ args_type : u'EmptyFlowArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Administrative'
+ default_args :   <EmptyFlowArgs('message EmptyFlowArgs {\n}')>
+ doc : u'Terminate a running client (does not disable, just kill).\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="Kill", )\n\n  Args: None'
+ name : u'Kill'
+}
+<class 'abc.KnowledgeBaseInitializationFlow'>
+message ApiFlowDescriptor {
+ args_type : u'KnowledgeBaseInitializationArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Collectors'
+ default_args :   <KnowledgeBaseInitializationArgs('message KnowledgeBaseInitializationArgs {\n}')>
+ doc : u'Flow that atttempts to initialize the knowledge base.\n\n  This flow processes all artifacts specified by the\n  Artifacts.knowledge_base config. We determine what knowledgebase\n  attributes are required, collect them, and return a filled\n  knowledgebase.\n\n  We don\'t try to fulfill dependencies in the tree order, the\n  reasoning is that some artifacts may fail, and some artifacts\n  provide the same dependency.\n\n  Instead we take an iterative approach and keep requesting artifacts\n  until all dependencies have been met.  If there is more than one\n  artifact that provides a dependency we will collect them all as they\n  likely have different performance characteristics, e.g. accuracy and\n  client impact.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="KnowledgeBaseInitializationFlow", require_complete=require_complete, lightweight=lightweight)\n\n  Args:\n    lightweight\n      description: If true skip all heavyweight artifacts defined in Artifacts.knowledge_base_heavyweight.\n      type: RDFBool\n      default: 1\n\n    require_complete\n      description: If true require all dependencies to be complete.  Raise if any are missing.\n      type: RDFBool\n      default: 1\n'
+ name : u'KnowledgeBaseInitializationFlow'
+}
+<class 'grr_response_server.flows.cron.system.LastAccessStats'>
+<class 'abc.LaunchBinary'>
+message ApiFlowDescriptor {
+ args_type : u'LaunchBinaryArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Administrative'
+ default_args :   <LaunchBinaryArgs('message LaunchBinaryArgs {\n}')>
+ doc : u'Launch a signed binary on a client.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="LaunchBinary", binary=binary, command_line=command_line)\n\n  Args:\n    binary\n      description: The URN of the binary to execute.\n      type: RDFURN\n      default: None\n\n    command_line\n      description: Binary Arguments as a shell command line.\n      type: RDFString\n      default: \n'
+ name : u'LaunchBinary'
+}
+<class 'abc.ListDirectory'>
+message ApiFlowDescriptor {
+ args_type : u'ListDirectoryArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Filesystem'
+ default_args :   <ListDirectoryArgs('message ListDirectoryArgs {\n}')>
+ doc : u'List files in a directory.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="ListDirectory", pathspec=pathspec)\n\n  Args:\n    pathspec\n      description: The pathspec for the directory to list.\n      type: PathSpec\n      default: None\n'
+ name : u'ListDirectory'
+}
+<class 'abc.ListProcesses'>
+message ApiFlowDescriptor {
+ args_type : u'ListProcessesArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Processes'
+ default_args :   <ListProcessesArgs('message ListProcessesArgs {\n}')>
+ doc : u'List running processes on a system.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="ListProcesses", filename_regex=filename_regex, fetch_binaries=fetch_binaries, connection_states=connection_states)\n\n  Args:\n    connection_states\n      description: Network connection states to match. If a process has any network connections in any status listed here, it will be considered a match\n      type: \n      default: None\n\n    fetch_binaries\n      description: \n      type: RDFBool\n      default: 0\n\n    filename_regex\n      description: Regex used to filter the list of processes.\n      type: RegularExpression\n      default: .\n'
+ name : u'ListProcesses'
+}
+<class 'grr_response_server.flows.general.windows_vsc.ListVolumeShadowCopies'>
+message ApiFlowDescriptor {
+ args_type : u'EmptyFlowArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Filesystem'
+ default_args :   <EmptyFlowArgs('message EmptyFlowArgs {\n}')>
+ doc : u'List the Volume Shadow Copies on the client.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="ListVolumeShadowCopies", )\n\n  Args: None'
+ name : u'ListVolumeShadowCopies'
+}
+<class 'grr_response_server.flows.general.filesystem.MakeNewAFF4SparseImage'>
+message ApiFlowDescriptor {
+ args_type : u'MakeNewAFF4SparseImageArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Filesystem'
+ default_args :   <MakeNewAFF4SparseImageArgs('message MakeNewAFF4SparseImageArgs {\n}')>
+ doc : u'Gets a new file from the client, possibly as an AFF4SparseImage.\n\n  If the filesize is >= the size threshold, then we get the file as an empty\n  AFF4SparseImage, otherwise we just call GetFile, which gets the complete file.\n\n  We do the check to see if the file is big enough to get as an AFF4SparseImage\n  in this flow so we don\'t need to do another round trip to the client.\n\n  Args:\n    pathspec: Pathspec of the file to look at.\n    size_threshold: If the file is bigger than this size, we\'ll get it as an\n      empty AFF4SparseImage, otherwise we\'ll just download the whole file as\n      usual with GetFile.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="MakeNewAFF4SparseImage", pathspec=pathspec, size_threshold=size_threshold)\n\n  Args:\n    pathspec\n      description: \n      type: PathSpec\n      default: None\n\n    size_threshold\n      description: \n      type: RDFInteger\n      default: 0\n'
+ name : u'MakeNewAFF4SparseImage'
+}
+<class 'abc.MultiGetFile'>
+<class 'grr_response_server.flows.general.administrative.NannyMessageHandlerFlow'>
+<class 'abc.Netstat'>
+message ApiFlowDescriptor {
+ args_type : u'NetstatArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Network'
+ default_args :   <NetstatArgs('message NetstatArgs {\n}')>
+ doc : u'List active network connections on a system.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="Netstat", listening_only=listening_only)\n\n  Args:\n    listening_only\n      description: If set, only listening connections are returned.\n      type: RDFBool\n      default: 0\n'
+ name : u'Netstat'
+}
+<class 'grr_response_server.flows.cron.system.OSBreakDown'>
+<class 'abc.OnlineNotification'>
+message ApiFlowDescriptor {
+ args_type : u'OnlineNotificationArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Administrative'
+ default_args :   <OnlineNotificationArgs('message OnlineNotificationArgs {\n email : DomainEmailAddress:\n    admin@localhost\n}')>
+ doc : u'Notifies by email when a client comes online in GRR.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="OnlineNotification", email=email)\n\n  Args:\n    email\n      description: Email address to send to. If not set, mail will be sent to the logged in user.\n      type: DomainEmailAddress\n      default: None\n'
+ name : u'OnlineNotification'
+}
+<class 'abc.OsqueryFlow'>
+message ApiFlowDescriptor {
+ args_type : u'OsqueryArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Collectors'
+ default_args :   <OsqueryArgs('message OsqueryArgs {\n}')>
+ doc : u'A flow mixin wrapping the osquery client action.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="OsqueryFlow", queries=queries)\n\n  Args:\n    queries\n      description: \n      type: \n      default: None\n'
+ friendly_name : u'osquery'
+ name : u'OsqueryFlow'
+}
+<class 'grr_response_server.flows.general.filetypes.PlistValueFilter'>
+message ApiFlowDescriptor {
+ args_type : u'PlistValueFilterArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'FileTypes'
+ default_args :   <PlistValueFilterArgs('message PlistValueFilterArgs {\n}')>
+ doc : u'Obtains values from a plist based on a context and a query filter.\n\n  This function will parse a plist. Obtain all the values under the path given\n  in context and then filter each of them against the given query and return\n  only these that match. I.e:\n\n  plist = {\n    \'values\': [13, 14, 15]\n    \'items\':\n      [\n        {\'name\': \'John\',\n         \'age\': 33,\n         \'children\': [\'John\', \'Phil\'],\n         },\n        {\'name\': \'Mike\',\n          \'age\': 24,\n          \'children\': [],\n        },\n      ],\n  }\n\n  A call to PlistValueFilter with context "items" and query "age > 25" will\n  return {\'name\': \'John\', \'age\': 33}.\n\n  If you don\'t specify a context, the full plist will be matched and returned\n  if the query succceeds. I,e: a call to PlistValueFilter without a context but\n  query "values contains 13" will return the full plist.\n\n\n  If you don\'t specify a query, all the values under the context parameter will\n  get returned. I.e: a call to PlistValueFilter with context "items.children"\n  and no query, will return [ [\'John\', \'Phil\'], []].\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="PlistValueFilter", request=request)\n\n  Args:\n    request\n      description: A request for the client to parse a plist file.\n      type: PlistRequest\n      default: None\n'
+ name : u'PlistValueFilter'
+}
+<class 'abc.ProcessHuntResultCollectionsCronFlow'>
+<class 'grr_response_server.flows.cron.system.PurgeClientStats'>
+<class 'abc.RecursiveListDirectory'>
+message ApiFlowDescriptor {
+ args_type : u'RecursiveListDirectoryArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Filesystem'
+ default_args :   <RecursiveListDirectoryArgs('message RecursiveListDirectoryArgs {\n}')>
+ doc : u'Recursively list directory on the client.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="RecursiveListDirectory", pathspec=pathspec, max_depth=max_depth)\n\n  Args:\n    max_depth\n      description: Maximum recursion depth.\n      type: RDFInteger\n      default: 5\n\n    pathspec\n      description: The pathspec for the directory to list.\n      type: PathSpec\n      default: None\n'
+ name : u'RecursiveListDirectory'
+}
+<class 'abc.RegistryFinder'>
+message ApiFlowDescriptor {
+ args_type : u'RegistryFinderArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Registry'
+ default_args :   <RegistryFinderArgs(u'message RegistryFinderArgs {\n keys_paths : [\n   GlobExpression:\n     HKEY_USERS/%%users.sid%%/Softwa...')>
+ doc : u'This flow looks for registry items matching given criteria.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="RegistryFinder", keys_paths=keys_paths, conditions=conditions)\n\n  Args:\n    conditions\n      description: These conditions will be applied to all items that match the keys path arguments.\n      type: \n      default: None\n\n    keys_paths\n      description: Glob expression for registry keys to be retrieved.\n      type: \n      default: None\n'
+ friendly_name : u'Registry Finder'
+ name : u'RegistryFinder'
+}
+<class 'grr_response_server.hunts.standard.SampleHunt'>
+<class 'abc.SendFile'>
+message ApiFlowDescriptor {
+ args_type : u'SendFileRequest'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Filesystem'
+ default_args :   <SendFileRequest('message SendFileRequest {\n}')>
+ doc : u'This flow sends a file to remote listener.\n\n  To use this flow, choose a key and an IV in hex format (if run from the GUI,\n  there will be a pregenerated pair key and iv for you to use) and run a\n  listener on the server you want to use like this:\n\n  nc -l <port> | openssl aes-128-cbc -d -K <key> -iv <iv> > <filename>\n\n  Returns to parent flow:\n    A rdf_client_fs.StatEntry of the sent file.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="SendFile", pathspec=pathspec, address_family=address_family, host=host, port=port, key=key, iv=iv)\n\n  Args:\n    address_family\n      description: address family to use (AF_INET or AF_INET6).\n      type: EnumNamedValue\n      default: INET\n\n    host\n      description: Hostname or IP to send the file to.\n      type: RDFString\n      default: \n\n    iv\n      description: The iv for AES, also given in hex representation.\n      type: AES128Key\n      default: None\n\n    key\n      description: An encryption key given in hex representation.\n      type: AES128Key\n      default: None\n\n    pathspec\n      description: The pathspec for the file to retrieve.\n      type: PathSpec\n      default: None\n\n    port\n      description: Port number on the listening server.\n      type: RDFInteger\n      default: 12345\n'
+ name : u'SendFile'
+}
+<class 'abc.SystemRootSystemDriveFallbackFlow'>
+<class 'grr_response_server.flows.general.transfer.TransferStore'>
+<class 'abc.Uninstall'>
+message ApiFlowDescriptor {
+ args_type : u'UninstallArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Administrative'
+ default_args :   <UninstallArgs('message UninstallArgs {\n}')>
+ doc : u'Removes the persistence mechanism which the client uses at boot.\n\n  For Windows and OSX, this will disable the service, and then stop the service.\n  For Linux this flow will fail as we haven\'t implemented it yet :)\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="Uninstall", kill=kill)\n\n  Args:\n    kill\n      description: Kills the client if set.\n      type: RDFBool\n      default: 0\n'
+ name : u'Uninstall'
+}
+<class 'abc.UpdateClient'>
+message ApiFlowDescriptor {
+ args_type : u'UpdateClientArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Administrative'
+ default_args :   <UpdateClientArgs('message UpdateClientArgs {\n}')>
+ doc : u'Updates the GRR client to a new version replacing the current client.\n\n  This will execute the specified installer on the client and then run\n  an Interrogate flow.\n\n  The new installer needs to be loaded into the database, generally in\n  /config/executables/<platform>/installers and must be signed using the\n  exec signing key.\n\n  Signing and upload of the file is done with config_updater.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="UpdateClient", blob_path=blob_path)\n\n  Args:\n    blob_path\n      description: An aff4 path to a GRRSignedBlob of a new client version.\n      type: RDFURN\n      default: None\n'
+ name : u'UpdateClient'
+}
+<class 'abc.UpdateConfiguration'>
+<class 'abc.UpdateSparseImageChunks'>
+message ApiFlowDescriptor {
+ args_type : u'UpdateSparseImageChunksArgs'
+ behaviours : [
+   u'ADVANCED'
+  ]
+ category : u'Filesystem'
+ default_args :   <UpdateSparseImageChunksArgs('message UpdateSparseImageChunksArgs {\n}')>
+ doc : u'Updates a list of chunks of a sparse image from the client.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="UpdateSparseImageChunks", file_urn=file_urn, chunks_to_fetch=chunks_to_fetch)\n\n  Args:\n    chunks_to_fetch\n      description: \n      type: \n      default: None\n\n    file_urn\n      description: The URN of the sparse image to update\n      type: RDFURN\n      default: None\n'
+ name : u'UpdateSparseImageChunks'
+}
+<class 'grr_response_server.aff4_objects.aff4_grr.UpdateVFSFile'>
+<class 'grr_response_server.hunts.standard.VariableGenericHunt'>
+<class 'grr_response_server.flow.WellKnownFlow'>
+<class 'abc.WindowsAllUsersProfileFallbackFlow'>
+<class 'abc.YaraDumpProcessMemory'>
+message ApiFlowDescriptor {
+ args_type : u'YaraProcessDumpArgs'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Yara'
+ default_args :   <YaraProcessDumpArgs('message YaraProcessDumpArgs {\n}')>
+ doc : u'Acquires memory for a given list of processes.\n\n  Note that accessing process memory with Yara on Linux causes\n  processes to pause. This can impact the client machines when dumping\n  large processes.\n  \n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="YaraDumpProcessMemory", pids=pids, process_regex=process_regex, ignore_grr_process=ignore_grr_process, dump_all_processes=dump_all_processes, size_limit=size_limit, chunk_size=chunk_size, skip_special_regions=skip_special_regions, skip_mapped_files=skip_mapped_files, skip_shared_regions=skip_shared_regions, skip_executable_regions=skip_executable_regions, skip_readonly_regions=skip_readonly_regions)\n\n  Args:\n    chunk_size\n      description: The chunk size to use when reading large memory regions.\n      type: RDFInteger\n      default: 104857600\n\n    dump_all_processes\n      description: This dumps all processes. Might return lots of data, use with care.\n      type: RDFBool\n      default: 0\n\n    ignore_grr_process\n      description: By default, the GRR process is not dumped. Clear this flag to change this behavior.\n      type: RDFBool\n      default: 1\n\n    pids\n      description: A list of pids to dump.\n      type: \n      default: None\n\n    process_regex\n      description: A regex to match against the process name. Only matching names will be dumped.\n      type: RDFString\n      default: \n\n    size_limit\n      description: Maximum amount of raw process memory to dump. Applies to all requested processes together. The first memory block going over the limit will not be written anymore. 0 indicates no limit.\n      type: ByteSize\n      default: 0\n\n    skip_executable_regions\n      description: Set this flag to avoid dumping executable regions. Applies to Linux and macOS.\n      type: RDFBool\n      default: 0\n\n    skip_mapped_files\n      description: Set this flag to avoid dumping mapped files. Applies to Linux only.\n      type: RDFBool\n      default: 1\n\n    skip_readonly_regions\n      description: Set this flag to avoid dumping readonly regions. Applies to Linux and macOS.\n      type: RDFBool\n      default: 0\n\n    skip_shared_regions\n      description: Set this flag to avoid dumping shared regions. Applies to Linux and macOS.\n      type: RDFBool\n      default: 0\n\n    skip_special_regions\n      description: Set this flag to avoid dumping device backed regions and guard pages. Applies to Windows only.\n      type: RDFBool\n      default: 0\n'
+ friendly_name : u'Yara Process Dump'
+ name : u'YaraDumpProcessMemory'
+}
+<class 'abc.YaraProcessScan'>
+message ApiFlowDescriptor {
+ args_type : u'YaraProcessScanRequest'
+ behaviours : [
+   u'ADVANCED'
+   u'BASIC'
+  ]
+ category : u'Yara'
+ default_args :   <YaraProcessScanRequest('message YaraProcessScanRequest {\n}')>
+ doc : u'Scans process memory using Yara.\n\n  Call Spec:\n    flow.StartAFF4Flow(client_id=client_id, flow_name="YaraProcessScan", yara_signature=yara_signature, pids=pids, process_regex=process_regex, include_errors_in_results=include_errors_in_results, include_misses_in_results=include_misses_in_results, ignore_grr_process=ignore_grr_process, per_process_timeout=per_process_timeout, chunk_size=chunk_size, overlap_size=overlap_size, skip_special_regions=skip_special_regions, skip_mapped_files=skip_mapped_files, skip_shared_regions=skip_shared_regions, skip_executable_regions=skip_executable_regions, skip_readonly_regions=skip_readonly_regions, dump_process_on_match=dump_process_on_match, max_results_per_process=max_results_per_process)\n\n  Args:\n    chunk_size\n      description: The chunk size to use when scanning large memory regions.\n      type: RDFInteger\n      default: 104857600\n\n    dump_process_on_match\n      description: Set this flag to schedule a process memory dump on every signature match.\n      type: RDFBool\n      default: 0\n\n    ignore_grr_process\n      description: By default, the GRR process is not scanned. Clear this flag to change this behavior.\n      type: RDFBool\n      default: 1\n\n    include_errors_in_results\n      description: Include processes that we failed to scan into returned results.\n      type: RDFBool\n      default: 0\n\n    include_misses_in_results\n      description: Include processes that came back without matches into returned results.\n      type: RDFBool\n      default: 0\n\n    max_results_per_process\n      description: Set this to limit the number of matches returned for each process scanned.\n      type: RDFInteger\n      default: 0\n\n    overlap_size\n      description: The overlap size to use when scanning large memory regions.\n      type: RDFInteger\n      default: 10485760\n\n    per_process_timeout\n      description: A timeout in seconds that is applied while scanning; applies to each scan individually.\n      type: RDFInteger\n      default: 0\n\n    pids\n      description: The pids to scan. No pids given indicates all processes.\n      type: \n      default: None\n\n    process_regex\n      description: A regex to match against the process name. Only matching names will be scanned.\n      type: RDFString\n      default: \n\n    skip_executable_regions\n      description: Set this flag to avoid scanning executable regions. Applies to Linux and macOS.\n      type: RDFBool\n      default: 0\n\n    skip_mapped_files\n      description: Set this flag to avoid scanning mapped files. Applies to Linux only.\n      type: RDFBool\n      default: 1\n\n    skip_readonly_regions\n      description: Set this flag to avoid scanning readonly regions. Applies to Linux and macOS.\n      type: RDFBool\n      default: 0\n\n    skip_shared_regions\n      description: Set this flag to avoid scanning shared regions. Applies to Linux and macOS.\n      type: RDFBool\n      default: 0\n\n    skip_special_regions\n      description: Set this flag to avoid scanning device backed regions and guard pages. Applies to Windows only.\n      type: RDFBool\n      default: 0\n\n    yara_signature\n      description: The yara signature(s) to use for scanning.\n      type: YaraSignature\n      default: None\n'
+ friendly_name : u'Yara Process Scan'
+ name : u'YaraProcessScan'
+
+53. navigator.html: u can change or add anything related to creating flows or any new button w keda
+
+
