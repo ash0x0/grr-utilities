@@ -5596,4 +5596,198 @@ message ApiFlowDescriptor {
 
 53. navigator.html: u can change or add anything related to creating flows or any new button w keda
 
+54. This is where flow details gets initiated: [the right side of strat flows page"
+<div grr-splitter orientation="horizontal" class="flow-details">
+
+    <div grr-splitter-pane size="75" id="main_rightTopPane" class="rightTopPane">
+      <grr-start-flow-form client-id="controller.clientId"
+                           descriptor="controller.selection.flowDescriptor" />
+    </div>
+
+    <div grr-splitter-pane size="25" id="main_rightBottomPane" class="rightBottomPane">
+      <grr-flow-info descriptor="controller.selection.flowDescriptor" />
+    </div>
+
+  </div>
+
+55. also look at grr-start-flow-form for each part in the conetxt:
+it knows all flow args and runner args from the descriptor which already got them when initializing:
+<grr-flow-form flow-args="controller.flowArguments"
+                 flow-runner-args="controller.flowRunnerArguments"
+                 with-output-plugins="clientId"
+                 has-errors="controller.flowFormHasErrors">
+  </grr-flow-form>
+
+56. This is how data is fetched from ui and sent into wsgi.py: [in start_flow_directive.js]
+  this.grrApiService_.post('/clients/' + clientId + '/flows', {
+    flow: {
+      runner_args: stripTypeInfo(this.flowRunnerArguments),
+      args: stripTypeInfo(this.flowArguments)
+    }
+  }).then(function success(response) {
+    this.responseData = response['data'];
+  }.bind(this), function failure(response) {
+    this.responseError = response['data']['message'] || 'Unknown error';
+  }.bind(this));
+  this.requestSent = true;
+};
+
+57. New Style Flows:
+FlowBase
+KnowledgeBaseInitializationFlow
+SystemRootSystemDriveFallbackFlow
+WindowsAllUsersProfileFallbackFlow
+GetFile
+MultiGetFile
+GetMBR
+SendFile
+ListDirectory
+RecursiveListDirectory
+UpdateSparseImageChunks
+FetchBufferForSparseImage
+Glob
+DiskVolumeInfo
+FingerprintFile
+FileFinder
+ClientFileFinder
+ArtifactCollectorFlow
+ArtifactFilesDownloaderFlow
+ClientArtifactCollector
+Interrogate
+GetClientStats
+DeleteGRRTempFiles
+Uninstall
+Kill
+UpdateConfiguration
+ExecutePythonHack
+ExecuteCommand
+OnlineNotification
+UpdateClient
+KeepAlive
+LaunchBinary
+CAEnroler
+CheckRunner
+FindFiles
+DumpFlashImage
+DumpACPITable
+Netstat
+OsqueryFlow
+ListProcesses
+RegistryFinder
+CollectRunKeyBinaries
+ChromeHistory
+FirefoxHistory
+CacheGrep
+YaraProcessScan
+YaraDumpProcessMemory
+
+
+58. flows of aff4flowregistery:
+FlowBase
+GRRFlow
+WellKnownFlow
+UpdateVFSFile
+KnowledgeBaseInitializationFlow
+SystemRootSystemDriveFallbackFlow
+WindowsAllUsersProfileFallbackFlow
+GetFile
+MultiGetFile
+GetMBR
+TransferStore
+SendFile
+ListDirectory
+RecursiveListDirectory
+UpdateSparseImageChunks
+FetchBufferForSparseImage
+MakeNewAFF4SparseImage
+Glob
+DiskVolumeInfo
+FingerprintFile
+FileFinder
+ClientFileFinder
+ArtifactCollectorFlow
+ArtifactFilesDownloaderFlow
+ClientArtifactCollector
+SystemCronFlow
+StatefulSystemCronFlow
+GRRHunt
+CleanHunts
+CleanCronJobs
+CleanInactiveClients
+Interrogate
+CreateGenericHuntFlow
+CreateAndRunGenericHuntFlow
+SampleHunt
+GenericHunt
+VariableGenericHunt
+AbstractClientStatsCronFlow
+GRRVersionBreakDown
+OSBreakDown
+LastAccessStats
+InterrogateClientsCronFlow
+PurgeClientStats
+GetClientStats
+GetClientStatsAuto
+DeleteGRRTempFiles
+Uninstall
+Kill
+UpdateConfiguration
+ExecutePythonHack
+ExecuteCommand
+Foreman
+OnlineNotification
+UpdateClient
+NannyMessageHandlerFlow
+ClientAlertHandlerFlow
+ClientStartupHandlerFlow
+KeepAlive
+LaunchBinary
+CAEnroler
+Enroler
+CheckRunner
+ClientVfsMigrationFlow
+PlistValueFilter
+FindFiles
+DumpFlashImage
+DumpACPITable
+Netstat
+OsqueryFlow
+ListProcesses
+RegistryFinder
+CollectRunKeyBinaries
+ChromeHistory
+FirefoxHistory
+CacheGrep
+ListVolumeShadowCopies
+YaraProcessScan
+YaraDumpProcessMemory
+ProcessHuntResultCollectionsCronFlow
+
+59. worth looking at later on: 
+class EventRegistry(MetaclassRegistry)
+
+60. where the registery gets initiated:
+  File "/home/samanoudy/.virtualenv/GRR/bin/grr_admin_ui", line 11, in <module>
+    load_entry_point('grr-response-server', 'console_scripts', 'grr_admin_ui')()
+  File "/home/samanoudy/grr/grr/server/grr_response_server/distro_entry.py", line 48, in AdminUI
+    from grr_response_server.gui import admin_ui
+  File "/home/samanoudy/grr/grr/server/grr_response_server/gui/admin_ui.py", line 24, in <module>
+    from grr_response_server import server_plugins
+  File "/home/samanoudy/grr/grr/server/grr_response_server/server_plugins.py", line 18, in <module>
+    from grr_response_server import export
+  File "/home/samanoudy/grr/grr/server/grr_response_server/export.py", line 34, in <module>
+    from grr_response_server import aff4
+  File "/home/samanoudy/grr/grr/server/grr_response_server/aff4.py", line 41, in <module>
+    from grr_response_server import data_store
+  File "/home/samanoudy/grr/grr/server/grr_response_server/data_store.py", line 70, in <module>
+    from grr_response_server import db
+  File "/home/samanoudy/grr/grr/server/grr_response_server/db.py", line 45, in <module>
+    from grr_response_server.rdfvalues import hunt_objects as rdf_hunt_objects
+  File "/home/samanoudy/grr/grr/server/grr_response_server/rdfvalues/hunt_objects.py", line 64, in <module>
+    class Hunt(rdf_structs.RDFProtoStruct):
+  File "/home/samanoudy/grr/grr/core/grr_response_core/lib/rdfvalues/structs.py", line 1633, in __init__
+    rdf_proto2.DefineFromProtobuf(cls, cls.protobuf)
+  File "/home/samanoudy/grr/grr/core/grr_response_core/lib/rdfvalues/proto2.py", line 211, in DefineFromProtobuf
+    field.message_type.name))
+
 
