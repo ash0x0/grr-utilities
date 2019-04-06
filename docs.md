@@ -5782,7 +5782,7 @@ class EventRegistry(MetaclassRegistry)
   File "/home/samanoudy/grr/grr/server/grr_response_server/data_store.py", line 70, in <module>
     from grr_response_server import db
   File "/home/samanoudy/grr/grr/server/grr_response_server/db.py", line 45, in <module>
-    from grr_response_server.rdfvalues import hunt_objects as rdf_hunt_objects
+    from grr_response_server.rdfvalues import hunt_objects as rdf_hunt_objects	
   File "/home/samanoudy/grr/grr/server/grr_response_server/rdfvalues/hunt_objects.py", line 64, in <module>
     class Hunt(rdf_structs.RDFProtoStruct):
   File "/home/samanoudy/grr/grr/core/grr_response_core/lib/rdfvalues/structs.py", line 1633, in __init__
@@ -5790,4 +5790,119 @@ class EventRegistry(MetaclassRegistry)
   File "/home/samanoudy/grr/grr/core/grr_response_core/lib/rdfvalues/proto2.py", line 211, in DefineFromProtobuf
     field.message_type.name))
 
+61. using rdfstruct protos is mainly for the following reasons:
+ """An RDFStruct which uses protobufs for serialization.
+  This implementation is faster than the standard protobuf library.
+  """
+62. there u could have any rdf deps to know any rdf values used by such proto as well. [such rdf values are usually also inherited from rdfstruct protos]
+https://afs.github.io/rdf-thrift/rdf-binary-thrift.html
 
+63. an aff4 object may contain an rdf value as one of its schema attributes. An rdf value may be non-part of any aff4 object as well. An Rdf value may be using Protopufs for serialization. Protopufs can be used for effecient data transfer while rdf is used for encoding and decoding for human readable formats.
+
+64. take a deeper look at flow_responses fakeresponse class:
+An object which emulates the responses.
+  This is only used internally to call a state method inline.
+
+65. How did they create the SignedBlob datatype and referenced it in the protopufs anywayss???
+66. no idea what is this: api_call_robot_router
+
+67. workers may work for specified queus for work in queues class defined in response_core_lib; needs deeper look
+68. flow_runner is responsible for the stuff with queue manager and creating urn for flows from session id, specifyin qued replies and requests
+
+69. Note that    # While wrapping the response in GrrMessage is not strictly necessary for
+      # output plugins, GrrMessage.source may be used by these plugins to fetch
+      # client's metadata and include it into the exported data.
+
+70. look at this later on:
+ERROR:2019-03-16 22:31:41,973 9409 MainProcess 139948654995200 Thread-193 frontend:205] Had to respond with status 500.
+Traceback (most recent call last):
+  File "/home/samanoudy/grr/grr/server/grr_response_server/bin/frontend.py", line 199, in do_POST
+    self.Control()
+  File "/home/samanoudy/grr/grr/core/grr_response_core/stats/stats_utils.py", line 55, in Decorated
+    return func(*args, **kwargs)
+  File "/home/samanoudy/grr/grr/core/grr_response_core/stats/stats_utils.py", line 33, in Decorated
+    return func(*args, **kwargs)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/bin/frontend.py", line 261, in Control
+    request_comms, responses_comms)
+  File "/home/samanoudy/grr/grr/core/grr_response_core/stats/stats_utils.py", line 55, in Decorated
+    return func(*args, **kwargs)
+  File "/home/samanoudy/grr/grr/core/grr_response_core/stats/stats_utils.py", line 33, in Decorated
+    return func(*args, **kwargs)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/frontend_lib.py", line 400, in HandleMessageBundles
+    self.ReceiveMessages(source, messages)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/frontend_lib.py", line 676, in ReceiveMessages
+    "ClientCrash", crash_details, token=self.token)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/events.py", line 51, in PublishEvent
+    cls.PublishMultipleEvents({event_name: [msg]}, token=token)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/events.py", line 76, in PublishMultipleEvents
+    event_cls().ProcessMessages(messages, token=token)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/flows/general/administrative.py", line 215, in ProcessMessages
+    is_html=True)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/email_alerts.py", line 153, in SendEmail
+    (config.CONFIG["Worker.smtp_server"], e))
+RuntimeError: Could not connect to SMTP server to send email. Please check config option Worker.smtp_server. Currently set to localhost. Error: [Errno 111] Connection refused
+ERROR:2019-03-16 22:32:42,468 9409 MainProcess 139948654995200 Thread-194 frontend:205] Had to respond with status 500.
+Traceback (most recent call last):
+  File "/home/samanoudy/grr/grr/server/grr_response_server/bin/frontend.py", line 199, in do_POST
+    self.Control()
+  File "/home/samanoudy/grr/grr/core/grr_response_core/stats/stats_utils.py", line 55, in Decorated
+    return func(*args, **kwargs)
+  File "/home/samanoudy/grr/grr/core/grr_response_core/stats/stats_utils.py", line 33, in Decorated
+    return func(*args, **kwargs)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/bin/frontend.py", line 261, in Control
+    request_comms, responses_comms)
+  File "/home/samanoudy/grr/grr/core/grr_response_core/stats/stats_utils.py", line 55, in Decorated
+    return func(*args, **kwargs)
+  File "/home/samanoudy/grr/grr/core/grr_response_core/stats/stats_utils.py", line 33, in Decorated
+    return func(*args, **kwargs)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/frontend_lib.py", line 400, in HandleMessageBundles
+    self.ReceiveMessages(source, messages)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/frontend_lib.py", line 676, in ReceiveMessages
+    "ClientCrash", crash_details, token=self.token)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/events.py", line 51, in PublishEvent
+    cls.PublishMultipleEvents({event_name: [msg]}, token=token)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/events.py", line 76, in PublishMultipleEvents
+    event_cls().ProcessMessages(messages, token=token)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/flows/general/administrative.py", line 215, in ProcessMessages
+    is_html=True)
+  File "/home/samanoudy/grr/grr/server/grr_response_server/email_alerts.py", line 153, in SendEmail
+    (config.CONFIG["Worker.smtp_server"], e))
+RuntimeError: Could not connect to SMTP server to send email. Please check config option Worker.smtp_server. Currently set to localhost. Error: [Errno 111] Connection refused
+
+
+71. check more on the Uninstall flow: what is the original flow?
+72. This error appears when trying to execute ping commands on client:
+GENERIC_ERROR
+Error message 	OSError(2, 'No such file or directory'): [Errno 2] No such file or directory
+Backtrace 	Traceback (most recent call last): File "/home/samanoudy/grr/grr/client/grr_response_client/actions.py", line 146, in Execute self.Run(args) File "/home/samanoudy/grr/grr/client/grr_response_client/client_actions/standard.py", line 660, in Run for res in ExecuteLineFromClient(args): File "/home/samanoudy/grr/grr/client/grr_response_client/client_actions/standard.py", line 637, in ExecuteLineFromClient res = client_utils_common.ExecuteLine(cmd, time_limit) File "/home/samanoudy/grr/grr/client/grr_response_client/client_utils_common.py", line 321, in ExecuteLine cmd,time_limit, use_client_context=use_client_context, cwd=cwd) File "/home/samanoudy/grr/grr/client/grr_response_client/client_utils_common.py", line 342, in _ExecuteLine cwd=cwd) File "/usr/lib/python2.7/subprocess.py", line 394, in __init__ errread, errwrite) File "/usr/lib/python2.7/subprocess.py", line 1047, in _execute_child raise child_exception OSError: [Errno 2] No such file or directory
+Cpu time used 	
+User cpu seconds used 	0
+System cpu seconds used 	0
+
+__%EOF%__
+
+__%BOF%__
+1. need to look at grr_client components.actions. grr_chipsec for more info
+2. ac and gui folders are the only change from master base and Nofal's
+3. Great Issue Solves for TK error:
+https://stackoverflow.com/questions/15884075/tkinter-in-a-virtualenv
+4. requirments.txt include the orginal but pointing to Nofal's master
+5. requirements2.txt has the google's master and need to pip/install all in the new cloned dir
+6. check https://github.com/google/grr/tree/master/terraform/demo/google
+and https://github.com/google/grr/issues/672
+for db instances	
+7. pip uninstall grr-response-server then redownload it again (3.2.4post6 is the currently working not post9!)
+8. also check https://github.com/google/grr/issues/639 for db 
+9. Checking write access on config /home/samanoudy/grr_new/grr/core/install_data/etc/server.local.yaml
+10. check response_server/mysql_pool for the "connectionpool" in the database
+11. response_core/lib/communicator includes the DecodeMessages func: inside it all messages get verified and message list could be seen 
+12. after that it goes to VerifyMessageSignature [in server/frontend_lib] to check the signature
+13. EncodeMessages in communicator in response core is used by the client and also the server.
+14. Web of Trust vs PKI.
+15. used AES: 128 cbc with iv and nonce is timestamp;
+	integ: use simple hmac or full hmac depending on endpoint compatibility
+16. #TODO isa: 
+		I. See why the executeline returns the output in status instead of results
+		II. Dig deeper in the databases dir in server
+		III.  Dig deeper in the CA_enroller flow and applied crypto
+__%EOF%__
